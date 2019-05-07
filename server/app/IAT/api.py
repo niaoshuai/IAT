@@ -480,8 +480,8 @@ def taskResult():
   content = {
     "testname": taskData.name,
     "testDesc": taskData.task_desc,
-    "startTime": long(startTime),
-    "endTime": long(endTime),
+    "startTime": int(startTime),
+    "endTime": int(endTime),
     "total": len(caseIds),
     "sucess": len(sucess),
     "fail": len(fail),

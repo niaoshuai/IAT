@@ -1,0 +1,15 @@
+version: "2"
+services:
+  iat-server:
+    image: registry.cn-beijing.aliyuncs.com/niao/iat-server:1.0.0
+    container_name: iat-server
+    links:
+    - iat-mysql
+  iat-mysql:
+    image: mysql:5.6
+    container_name: iat-mysql
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_DATABASE=IAT
+    - MYSQL_ROOT_PASSWORD=root

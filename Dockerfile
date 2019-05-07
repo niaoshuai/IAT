@@ -1,6 +1,6 @@
 FROM node:latest
 
-WORKDIR /usr/src/app/
+WORKDIR /usr/local/src/iat-h5/
 
 COPY package.json ./
 RUN npm install --silent --no-cache

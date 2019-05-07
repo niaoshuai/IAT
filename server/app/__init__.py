@@ -38,7 +38,7 @@ try:
   add_column(db.session, 'sample', column)
   print '创建新字段'
 except Exception,e:
-  print "无需更新"
+  print '无需更新'
 
 '''
 注册蓝图

@@ -885,7 +885,7 @@ def debugSample():
 
 def encrypt_name(name, salt=None, encryptlop=30):
   if not salt:
-    salt = os.urandom(16).encode('hex')  # length 32
+    salt = os.urandom(16).decode('hex')  # length 32
   for i in range(encryptlop):
     name = hashlib.sha1(name + salt).hexdigest()  # length 64
   return name

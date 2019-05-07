@@ -1,6 +1,7 @@
 #-*-coding:utf-8-*-
 from xml.etree import ElementTree as et
 import sys,requests,json,time,random
+from imp import reload
 reload(sys)
 sys.setdefaultencoding("utf8")
 

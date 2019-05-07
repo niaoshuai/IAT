@@ -888,7 +888,7 @@ def encrypt_name(name, salt=None, encryptlop=30):
     # salt = os.urandom(16).encode('hex')  # length 32
     salt = os.urandom(16).hex()  # length 32
   for i in range(encryptlop):
-    name = hashlib.sha1(name + salt).hexdigest()  # length 64
+    name = hashlib.sha1((name + salt).encode('utf8')).hexdigest()  # length 64
   return name
 
 @api.route('/uploadFile',methods=['POST'])

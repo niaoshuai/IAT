@@ -37,7 +37,7 @@ try:
   column = "(`pre_shell_type` smallint(6) , `pre_shell_data` mediumtext ,`post_shell_type` smallint(6) ,`post_shell_data` mediumtext)"
   add_column(db.session, 'sample', column)
   print('创建新字段')
-except Exception,e:
+except Exception as e:
   print('无需更新')
 
 '''

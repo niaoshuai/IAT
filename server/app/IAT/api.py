@@ -903,11 +903,11 @@ def uploadFile():
     filePath = 'app/'+app.config['UPLOAD_FOLDER']+fileName
     projectRootId = Tree.query.filter_by(project_id=id,pid=0).first().id
     if fileType == 'har':
-      print '开始导入har'
+      print("开始导入har")
       subprocess.call('python runAutoBuild.py %s %s %s'%(user_id,projectRootId,filePath),shell=True)
       os.remove(filePath)
     if fileType == 'jmx':
-      print '开始导入jmx'
+      print('开始导入jmx')
       subprocess.call('python runAutoBuildFromJmx.py %s %s %s' % (user_id,projectRootId, filePath), shell=True)
       os.remove(filePath)
     return make_response(jsonify({'code': 0, 'content':None, 'msg': 'upload sucess'}))

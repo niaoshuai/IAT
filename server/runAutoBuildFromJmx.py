@@ -3,7 +3,7 @@ from xml.etree import ElementTree as et
 import sys,requests,json,time,random
 from imp import reload
 reload(sys)
-sys.setdefaultencoding("utf8")
+# sys.setdefaultencoding("utf8")
 
 def addCase(projectId,name):
   data = {"id":projectId,"name":name}

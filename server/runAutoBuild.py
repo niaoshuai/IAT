@@ -29,8 +29,8 @@ def addSample(caseId,info):
   try:
     response = res.json()
     print(response["msg"])
-  except Exception as
-e:
+  except Exception as e:
+
     print(e)
     print("数据异常：",data)
 

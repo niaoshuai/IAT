@@ -16,4 +16,4 @@ RUN apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 lib
 
 RUN npm run test:all
 
-CMD ["npm", "run", "build"]
+CMD ["npm", "start"]

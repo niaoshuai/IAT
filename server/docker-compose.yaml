@@ -3,6 +3,8 @@ services:
   iat-server:
     image: registry.cn-beijing.aliyuncs.com/niao/iat-server:1.0.0
     container_name: iat-server
+    ports:
+    - "5000:5000"
     links:
     - iat-mysql
   iat-mysql:

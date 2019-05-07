@@ -33,7 +33,7 @@ def addProject():
     db.session.commit()
     addTreeNote(data.id, 0, name, 1, user_id, 0)
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'新建成功!'}))
-  except Exception, e:
+  except Exception as e:
     print e
     return make_response(jsonify({'code': 10002, 'content': None, 'msg': u'新建失败!'}))
 
@@ -156,7 +156,7 @@ def addSubFolder():
     db.session.add(data)
     db.session.commit()
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'新建成功!'}))
-  except Exception, e:
+  except Exception as e:
     print e
     return make_response(jsonify({'code': 10002, 'content': None, 'msg': u'新建失败!'}))
 
@@ -176,7 +176,8 @@ def deleteFolder():
       return make_response(jsonify({'code': 0, 'content': None, 'msg': u'删除成功!'}))
     else:
       return make_response(jsonify({'code': 10001, 'content': None, 'msg': u'非空目录不可删除!'}))
-  except Exception, e:
+  except Exception as
+ e:
     print e
     return make_response(jsonify({'code': 10002, 'content': None, 'msg': u'删除失败!'}))
 
@@ -196,7 +197,8 @@ def deleteCase():
       return make_response(jsonify({'code': 0, 'content': None, 'msg': u'删除成功!'}))
     else:
       return make_response(jsonify({'code': 10002, 'content': None, 'msg': u'删除失败!'}))
-  except Exception, e:
+  except Exception as
+ e:
     print e
     return make_response(jsonify({'code': 10002, 'content': None, 'msg': u'删除失败!'}))
 
@@ -218,7 +220,8 @@ def copyCase():
       db.session.add(addData)
       db.session.commit()
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'复制成功!'}))
-  except Exception, e:
+  except Exception as
+ e:
     print e
     return make_response(jsonify({'code': 10002, 'content': None, 'msg': u'复制成功!'}))
 
@@ -236,7 +239,8 @@ def addCase():
     db.session.add(data)
     db.session.commit()
     return make_response(jsonify({'code': 0, 'content': {"id":data.id}, 'msg': u'新建成功!'}))
-  except Exception, e:
+  except Exception as
+ e:
     print e
     return make_response(jsonify({'code': 10002, 'content': None, 'msg': u'新建失败!'}))
 
@@ -536,7 +540,8 @@ def taskDelete():
     db.session.delete(taskData)
     db.session.commit()
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'删除成功!'}))
-  except Exception, e:
+  except Exception as
+ e:
     print e
     return make_response(jsonify({'code': 10001, 'content': None, 'msg': u'删除失败!'}))
 
@@ -871,7 +876,8 @@ def debugSample():
       }
       return make_response(jsonify({'code': 0, 'content': content, 'msg': ''}))
 
-    except Exception, e:
+    except Exception as
+ e:
       print e
       return make_response(jsonify({'code': 10001, 'content': None, 'msg': 'server error!'}))
 

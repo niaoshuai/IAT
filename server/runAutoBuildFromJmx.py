@@ -109,7 +109,6 @@ def runbuild(userId,projectId,fileName):
             jsonPath1=""
             expectValue=""
             for jsonPath in list(childNode2):
-              
               if jsonPath.attrib['name'] == 'JSON_PATH':
                 jsonPath1=jsonPath.text
               if jsonPath.attrib['name'] == 'EXPECTED_VALUE':
@@ -120,12 +119,12 @@ def runbuild(userId,projectId,fileName):
               "key":jsonPath1,
               "value":expectValue,
             })
-            assertsType=2
+            # assertsType=2
         
         info = {
           "asserts": {
             "assertData": assertData,
-            "assertsType": assertsType
+            "assertsType": 2
           },
           "extract": {
             "extractData": extractData,

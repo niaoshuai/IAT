@@ -880,7 +880,6 @@ def debugSample():
 
     except Exception as e:
       print(e)
-
       return make_response(jsonify({'code': 10001, 'content': None, 'msg': 'server error!'}))
 
 def encrypt_name(name, salt=None, encryptlop=30):

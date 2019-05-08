@@ -120,7 +120,7 @@ def runbuild(userId,projectId,fileName):
               "key":jsonPath1,
               "value":expectValue,
             })
-            assertsType=1
+            assertsType=2
         
         info = {
           "asserts": {

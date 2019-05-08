@@ -1,5 +1,5 @@
 #-*-coding:utf-8-*-
-from xml.etree import ElementTree as et
+from xml.etree import ElementTree as ET
 import sys,requests,json,time,random
 from imp import reload
 reload(sys)
@@ -32,64 +32,182 @@ def addSample(caseId,info):
     print("数据异常：",data)
 
 def runbuild(userId,projectId,fileName):
-  root=et.parse(fileName)
-  for each in root.getiterator("HTTPSamplerProxy"):
-    path = ''
-    method = ''
-    testname = each.attrib['testname']
-    params = []
-    paramType = 1
-    for childNode in each.getchildren():
-      if childNode.tag == 'elementProp':
-        for paramsContainerNode in childNode.getchildren():
-          for paramsNode in paramsContainerNode.getchildren():
-            key = ''
-            value = ''
-            for paramsNodeChildren in paramsNode.getchildren():
-              if paramsNodeChildren.attrib['name'] == 'Argument.name':
-                key = paramsNodeChildren.text
-              if paramsNodeChildren.attrib['name'] == 'Argument.value':
-                value = paramsNodeChildren.text
+  # 解析XML文件
+  tree=ET.parse(fileName)
+  root = tree.getroot()
+  # 循环所有的HTTP请求
 
-            params.append({
-              "id":int(round(time.time() * 1000))+random.randint(1, 20),
-              "key":key,
-              "value":value,
-              "type": False,
+  # 首先处理线程组
+
+  # 定位到
+  # root = root.getElementsByTagName('hashTree')[0].getElementsByTagName('hashTree')[0]
+
+  # for json in root.iter("JSONPostProcessor"):
+  #   for childNode in json.getchildren():
+  #     if childNode.attrib['name'] == 'JSONPostProcessor.referenceNames':
+  #       print(childNode.text)
+
+  for index,hashTreeTmp1 in enumerate(root.iter("hashTree")):
+    # 获取所有的hashTree
+    allChildren = hashTreeTmp1.getchildren()
+    for index1,childNode1 in enumerate(allChildren):
+      if childNode1.tag == 'HTTPSamplerProxy':
+        path = ''
+        method = ''
+        testname = childNode1.attrib['testname']
+        params = []
+        paramType = 1
+
+        for childNode in childNode1.getchildren():
+          if childNode.tag == 'elementProp':
+            for paramsContainerNode in childNode.getchildren():
+              for paramsNode in paramsContainerNode.getchildren():
+                key = ''
+                value = ''
+                for paramsNodeChildren in paramsNode.getchildren():
+                  if paramsNodeChildren.attrib['name'] == 'Argument.name':
+                    key = paramsNodeChildren.text
+                  if paramsNodeChildren.attrib['name'] == 'Argument.value':
+                    value = paramsNodeChildren.text
+
+                params.append({
+                  "id":int(round(time.time() * 1000))+random.randint(1, 20),
+                  "key":key,
+                  "value":value,
+                  "type": False,
+                })
+          if childNode.attrib['name'] == 'HTTPSampler.path':
+            path = childNode.text
+          if childNode.attrib['name'] == 'HTTPSampler.method':
+            method = childNode.text
+          if childNode.attrib['name'] == 'HTTPSampler.DO_MULTIPART_POST':
+            if childNode.text == 'true':
+              paramType = 3
+
+        # 读取 断言 jsonPath
+        assertData = []
+        assertsType = 0  
+        extractData = []
+        extractType = 0
+
+        for index2,childNode2 in enumerate(allChildren[index1+1].getchildren()):
+          if childNode2.tag == 'JSONPostProcessor':
+            jsonPathExprs=''
+            referenceNames=''
+            for jsonPost in childNode2.getchildren():
+              if jsonPost.attrib['name'] == 'JSONPostProcessor.jsonPathExprs':
+                jsonPathExprs=jsonPost.text
+              if jsonPost.attrib['name'] == 'JSONPostProcessor.referenceNames':
+                referenceNames=jsonPost.text
+              
+            extractData.append({
+              "id":int(round(time.time() * 1000)),
+              "key":referenceNames,
+              "value":jsonPathExprs
             })
-      if childNode.attrib['name'] == 'HTTPSampler.path':
-        path = childNode.text
-      if childNode.attrib['name'] == 'HTTPSampler.method':
-        method = childNode.text
-      if childNode.attrib['name'] == 'HTTPSampler.DO_MULTIPART_POST':
-        if childNode.text == 'true':
-          paramType = 3
-    info = {
-      "asserts": {
-        "assertData": [{
-          "id": int(round(time.time() * 1000)),
-          "value": "\"code\":0"
-        }],
-        "assertsType": 1
-      },
-      "extract": {
-        "extractData": [],
-        "extractType": 0
-      },
-      "method": method,
-      "name": testname,
-      "params": params,
-      "paramType": paramType,
-      "path": path,
-      "user_id": userId,
-      "preShellType": 0,
-      "preShellData": "",
-      "postShellType": 0,
-      "postShellData": "",
-    }
-    caseId = addCase(projectId, testname)
-    if caseId:
-      addSample(caseId, info)
+            extractType =1
+          elif childNode2.tag == 'JSONPathAssertion':
+            jsonPath1=""
+            expectValue=""
+            for jsonPath in childNode2.getchildren():
+              
+              if jsonPath.attrib['name'] == 'JSON_PATH':
+                jsonPath1=jsonPath.text
+              if jsonPath.attrib['name'] == 'EXPECTED_VALUE':
+                expectValue=jsonPath.text
+
+            assertData.append({
+              "id":int(round(time.time() * 1000)),
+              "key":jsonPath1,
+              "value":expectValue,
+            })
+            assertsType=1
+        
+        info = {
+          "asserts": {
+            "assertData": assertData,
+            "assertsType": assertsType
+          },
+          "extract": {
+            "extractData": extractData,
+            "extractType": extractType
+          },
+          "method": method,
+          "name": testname,
+          "params": params,
+          "paramType": paramType,
+          "path": path,
+          "user_id": userId,
+          "preShellType": 0,
+          "preShellData": "",
+          "postShellType": 0,
+          "postShellData": "",
+        }
+
+        # print(info)
+        caseId = addCase(projectId, testname)
+        if caseId:
+          addSample(caseId, info)
+  
+  # 遍历得到所有的HTTP
+  # for httpSamplerProxy in tree.iter("HTTPSamplerProxy"):
+  #   path = ''
+  #   method = ''
+  #   testname = httpSamplerProxy.attrib['testname']
+  #   params = []
+  #   paramType = 1
+   
+  #   for childNode in httpSamplerProxy.getchildren():
+  #     if childNode.tag == 'elementProp':
+  #       for paramsContainerNode in childNode.getchildren():
+  #         for paramsNode in paramsContainerNode.getchildren():
+  #           key = ''
+  #           value = ''
+  #           for paramsNodeChildren in paramsNode.getchildren():
+  #             if paramsNodeChildren.attrib['name'] == 'Argument.name':
+  #               key = paramsNodeChildren.text
+  #             if paramsNodeChildren.attrib['name'] == 'Argument.value':
+  #               value = paramsNodeChildren.text
+
+  #           params.append({
+  #             "id":int(round(time.time() * 1000))+random.randint(1, 20),
+  #             "key":key,
+  #             "value":value,
+  #             "type": False,
+  #           })
+  #     if childNode.attrib['name'] == 'HTTPSampler.path':
+  #       path = childNode.text
+  #     if childNode.attrib['name'] == 'HTTPSampler.method':
+  #       method = childNode.text
+  #     if childNode.attrib['name'] == 'HTTPSampler.DO_MULTIPART_POST':
+  #       if childNode.text == 'true':
+  #         paramType = 3
+    # info = {
+    #   "asserts": {
+    #     "assertData": [{
+    #       "id": int(round(time.time() * 1000)),
+    #       "value": "\"code\":0"
+    #     }],
+    #     "assertsType": 1
+    #   },
+    #   "extract": {
+    #     "extractData": [],
+    #     "extractType": 0
+    #   },
+    #   "method": method,
+    #   "name": testname,
+    #   "params": params,
+    #   "paramType": paramType,
+    #   "path": path,
+    #   "user_id": userId,
+    #   "preShellType": 0,
+    #   "preShellData": "",
+    #   "postShellType": 0,
+    #   "postShellData": "",
+    # }
+    # caseId = addCase(projectId, testname)
+    # if caseId:
+    #   addSample(caseId, info)
 
     # print testname
     # print method

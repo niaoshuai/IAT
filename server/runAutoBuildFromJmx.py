@@ -124,7 +124,7 @@ def runbuild(userId,projectId,fileName):
         info = {
           "asserts": {
             "assertData": assertData,
-            "assertType": 2
+            "assertsType": 2
           },
           "extract": {
             "extractData": extractData,

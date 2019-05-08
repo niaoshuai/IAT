@@ -1,8 +1,7 @@
 #-*-coding:utf-8-*-
 from xml.etree import ElementTree as ET
-import sys,requests,json,time,random
-from imp import reload
-reload(sys)
+import sys,requests,json,time,random,importlib
+importlib.reload(sys)
 # sys.setdefaultencoding("utf8")
 
 def addCase(projectId,name):

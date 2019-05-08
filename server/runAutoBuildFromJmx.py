@@ -49,7 +49,7 @@ def runbuild(userId,projectId,fileName):
 
   for index,hashTreeTmp1 in enumerate(root.iter("hashTree")):
     # 获取所有的hashTree
-    allChildren = hashTreeTmp1.getchildren()
+    allChildren = list(hashTreeTmp1)
     for index1,childNode1 in enumerate(allChildren):
       if childNode1.tag == 'HTTPSamplerProxy':
         path = ''
@@ -58,13 +58,13 @@ def runbuild(userId,projectId,fileName):
         params = []
         paramType = 1
 
-        for childNode in childNode1.getchildren():
+        for childNode in list(childNode1):
           if childNode.tag == 'elementProp':
-            for paramsContainerNode in childNode.getchildren():
-              for paramsNode in paramsContainerNode.getchildren():
+            for paramsContainerNode in list(childNode):
+              for paramsNode in list(paramsContainerNode):
                 key = ''
                 value = ''
-                for paramsNodeChildren in paramsNode.getchildren():
+                for paramsNodeChildren in list(paramsNode):
                   if paramsNodeChildren.attrib['name'] == 'Argument.name':
                     key = paramsNodeChildren.text
                   if paramsNodeChildren.attrib['name'] == 'Argument.value':
@@ -90,11 +90,11 @@ def runbuild(userId,projectId,fileName):
         extractData = []
         extractType = 0
 
-        for index2,childNode2 in enumerate(allChildren[index1+1].getchildren()):
+        for index2,childNode2 in enumerate(list(allChildren[index1+1])):
           if childNode2.tag == 'JSONPostProcessor':
             jsonPathExprs=''
             referenceNames=''
-            for jsonPost in childNode2.getchildren():
+            for jsonPost in list(childNode2):
               if jsonPost.attrib['name'] == 'JSONPostProcessor.jsonPathExprs':
                 jsonPathExprs=jsonPost.text
               if jsonPost.attrib['name'] == 'JSONPostProcessor.referenceNames':
@@ -109,7 +109,7 @@ def runbuild(userId,projectId,fileName):
           elif childNode2.tag == 'JSONPathAssertion':
             jsonPath1=""
             expectValue=""
-            for jsonPath in childNode2.getchildren():
+            for jsonPath in list(childNode2):
               
               if jsonPath.attrib['name'] == 'JSON_PATH':
                 jsonPath1=jsonPath.text

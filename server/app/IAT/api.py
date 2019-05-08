@@ -803,7 +803,7 @@ def updateSample():
     return make_response(jsonify({'code': 0, 'msg': u'sucess', 'content': []}))
   else:
     project_id = Tree.query.filter_by(id=id).first().project_id
-    addData = Sample(id, info["path"], info["method"],info["paramType"], json.dumps(info["params"]), 1,
+    addData = Sample(id, info["path"], info["method"],info["paramType"], json.dumps(info["params"]),info["asserts"]["assertsType"] ,
                      json.dumps(info["asserts"]["assertData"]), info["extract"]["extractType"], '',
                      json.dumps(info["extract"]["extractData"]), user_id, project_id,info["preShellType"],info["preShellData"],info["postShellType"],info["postShellData"])
     db.session.add(addData)

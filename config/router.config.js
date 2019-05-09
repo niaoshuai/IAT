@@ -164,15 +164,15 @@ export default [
         name: 'system',
         icon: 'code-sandbox',
         routes: [
-          // {
-          //   path: '/system/index',
-          //   name: 'index',
-          //   component: './System/index',
-          // },
           {
             path: '/system/project',
             name: 'project',
             component: './System/project',
+          },
+          {
+            path: '/system/jmeter',
+            name: 'jmeter',
+            component: './System/jmeter',
           },
         ],
       },

@@ -4,7 +4,6 @@ import { formatMessage } from 'umi/locale';
 import Link from 'umi/link';
 import { Icon } from 'antd';
 import GlobalFooter from '@/components/GlobalFooter';
-import SelectLang from '@/components/SelectLang';
 import styles from './UserLayout.less';
 import logo from '../assets/logo.png';
 
@@ -28,7 +27,7 @@ const links = [
 
 const copyright = (
   <Fragment>
-    Copyright <Icon type="copyright" /> 2018 技术部老油条出品
+    Copyright <Icon type="copyright" /> 2019 技术部老油条出品
   </Fragment>
 );
 
@@ -49,18 +48,16 @@ class UserLayout extends React.PureComponent {
     return (
       // @TODO <DocumentTitle title={this.getPageTitle()}>
       <div className={styles.container}>
-        <div className={styles.lang}>
-          {/*<SelectLang />*/}
-        </div>
+        <div className={styles.lang}>{/*<SelectLang />*/}</div>
         <div className={styles.content}>
           <div className={styles.top}>
             <div className={styles.header}>
               <Link to="/">
                 <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>IAT Manager</span>
+                <span className={styles.title}>自动化测试</span>
               </Link>
             </div>
-            <div className={styles.desc}>IAT Manager</div>
+            <div className={styles.desc}>自动化测试</div>
           </div>
           {children}
         </div>

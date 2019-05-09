@@ -149,26 +149,38 @@ export async function queryTaskDelete(params) {
 }
 
 export async function queryProjectList(params) {
-  return request(`/api/IAT/projectList?status=${params.status.toString()}&_=${new Date().getTime().toString()}`);
+  return request(
+    `/api/IAT/projectList?status=${params.status.toString()}&_=${new Date().getTime().toString()}`
+  );
 }
 
 export async function queryTaskInfo(params) {
-  return request(`/api/IAT/taskPrew?id=${params.id.toString()}&_=${new Date().getTime().toString()}`);
+  return request(
+    `/api/IAT/taskPrew?id=${params.id.toString()}&_=${new Date().getTime().toString()}`
+  );
 }
 
 export async function queryTaskResult(params) {
-  return request(`/api/IAT/taskResult?id=${params.id.toString()}&_=${new Date().getTime().toString()}`);
+  return request(
+    `/api/IAT/taskResult?id=${params.id.toString()}&_=${new Date().getTime().toString()}`
+  );
 }
 
 export async function queryTreeList(params) {
-  return request(`/api/IAT/treeList?id=${params.id.toString()}&_=${new Date().getTime().toString()}`);
+  return request(
+    `/api/IAT/treeList?id=${params.id.toString()}&_=${new Date().getTime().toString()}`
+  );
 }
 
-export async function queryHomeData(params) {
+export async function queryHomeData() {
   return request(`/api/IAT/getHomeData?_=${new Date().getTime().toString()}`);
 }
 
-//==========
+export async function queryJmeterList(params) {
+  return request(
+    `/api/IAT/jmeterList?status=${params.status.toString()}&_=${new Date().getTime().toString()}`
+  );
+}
 
 export async function queryAddGood(params) {
   return request('/api/shop/addGood', {
@@ -220,7 +232,9 @@ export async function queryDownImage(params) {
 }
 
 export async function queryClassList(params) {
-  return request(`/api/shop/classList?status=${params.status.toString()}&_=${new Date().getTime().toString()}`);
+  return request(
+    `/api/shop/classList?status=${params.status.toString()}&_=${new Date().getTime().toString()}`
+  );
 }
 
 export async function queryShopGoodInfo() {
@@ -240,15 +254,27 @@ export async function refuseScanUrl() {
 }
 
 export async function queryGetToolsList(params) {
-  return request(`/api/shop/getToolsList?_=${new Date().getTime().toString()}&pageIndex=${params.pageIndex.toString()}`);
+  return request(
+    `/api/shop/getToolsList?_=${new Date()
+      .getTime()
+      .toString()}&pageIndex=${params.pageIndex.toString()}`
+  );
 }
 
 export async function queryGoodDetail(params) {
-  return request(`/api/shop/goodDetail?detailId=${params.detailId.toString()}&_=${new Date().getTime().toString()}`);
+  return request(
+    `/api/shop/goodDetail?detailId=${params.detailId.toString()}&_=${new Date()
+      .getTime()
+      .toString()}`
+  );
 }
 
 export async function queryGoodList(params) {
-  return request(`/api/shop/goodList?status=${params.status.toString()}&searchKey=${params.searchKey.toString()}&_=${new Date().getTime().toString()}`);
+  return request(
+    `/api/shop/goodList?status=${params.status.toString()}&searchKey=${params.searchKey.toString()}&_=${new Date()
+      .getTime()
+      .toString()}`
+  );
 }
 
 export async function queryAccountLogout() {
@@ -268,9 +294,6 @@ export async function fakeRegister(params) {
     body: params,
   });
 }
-
-//=======================================
-
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');

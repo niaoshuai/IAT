@@ -1,12 +1,12 @@
 #-*-coding:utf-8-*-
-import sys,requests,os,subprocess,json
+import sys,requests,os,subprocess,json,importlib
 import xml.etree.ElementTree as ET
 from datetime import datetime
-import pandas as pd
+# import pandas as pd
 
 default_encoding = 'utf-8'
 if sys.getdefaultencoding() != default_encoding:
-  reload(sys)
+  importlib.reload(sys)
   sys.setdefaultencoding(default_encoding)
 
 #状态设置请求
@@ -264,6 +264,12 @@ def makeResultPath(now):
 def runJmeterTest(reulstPath):
   #cmd = "jmeter -n -t %s -l %s -e -o %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv',reulstPath+'/resultDir')
   cmd = "jmeter -n -t %s -l %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv')
+  print(cmd)
+  subprocess.call(cmd, shell=True)
+
+def runJmeterTest1(reulstPath):
+  #cmd = "jmeter -n -t %s -l %s -e -o %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv',reulstPath+'/resultDir')
+  cmd = "jmeter -n -t %s -l %s "%(reulstPath,'/home/niaoshuai/test/result.csv')
   print(cmd)
   subprocess.call(cmd, shell=True)
 

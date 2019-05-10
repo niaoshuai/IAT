@@ -1,8 +1,9 @@
 #-*-coding:utf-8-*-
 import sys,requests,os,subprocess,json,importlib
+import pandas as pd
 import xml.etree.ElementTree as ET
 from datetime import datetime
-# import pandas as pd
+
 
 default_encoding = 'utf-8'
 if sys.getdefaultencoding() != default_encoding:

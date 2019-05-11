@@ -339,7 +339,7 @@ def curlSlaveCall(jsonFile,reulstPath,taskId):
 
 def curlMasterCall(jsonFile,reulstPath,taskId):
   client = docker.from_env()
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+reulstPath+'/test.jmx'+' -R jmeter-slave -l '+reulstPath+'/test.jmx'+' -X',name="jmeter-master-"+taskId,volumes={'/home/niaoshuai/docker_mnt': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave":"jmeter-slave"})
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+reulstPath+'/test.jmx'+' -R jmeter-slave -l '+reulstPath+'/test.jmx'+' -X',name="jmeter-master-"+taskId,volumes={'/home/niaoshuai/docker_mnt': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave"+taskId:"jmeter-slave"})
   client.close
 
 def runJmeterTest1(reulstPath):

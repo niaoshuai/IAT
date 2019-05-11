@@ -7,6 +7,8 @@ services:
     - "5000:5000"
     links:
     - iat-mysql
+    volumes:
+    - /home/niaoshuai/docker_mnt/:/jmeter_log
   iat-mysql:
     image: mysql:5.6
     container_name: iat-mysql

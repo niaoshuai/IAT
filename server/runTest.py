@@ -253,12 +253,12 @@ def set_data(tree,data):
   return tree
 
 def makeResultPath(now):
-  reulstPath = 'scripts/'+now
+  reulstPath = '/jmeter_log/'+now
   if not os.path.exists(reulstPath):
     os.makedirs(reulstPath)
   else:
     now = datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
-    reulstPath = 'scripts/' + now
+    reulstPath = '/jmeter_log/' + now
     os.makedirs(reulstPath)
   return reulstPath
 

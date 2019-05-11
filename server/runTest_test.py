@@ -10,7 +10,7 @@ class TestRunJmeterTest(unittest.TestCase):
     #     runJmeterTest1(fileName)
 
     def test_import(self):
-        fileName = 'TestData.jmx'
+        fileName = '/jmeter_log/'
         runJmeterTestDocker(fileName)
 
 

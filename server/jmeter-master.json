@@ -1,10 +1,18 @@
 {
-    "Image": "registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0",
+    "Image": "registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0",
     "Cmd": [
+        "-t",
+        "${FILEPATH}",
+        "-R",
+        "${REMOTE_HOST}",
         "-j",
-        "/jmeter_log/master.log"
+        "/jmeter_log/master.log",
+        "-l",
+        "${TEST_RESULT}",
+        "-X"
     ],
     "HostConfig": {
-        "Binds": ["/home/niaoshuai/docker_mnt:/jmeter_log:rw"]
+        "Binds": ["/home/niaoshuai/docker_mnt:/jmeter_log:rw"],
+        "Links": ["jmeter-slave:jmeter-slave"]
     }
 }

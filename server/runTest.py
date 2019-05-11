@@ -275,26 +275,52 @@ def makeResultPath(now):
 # 此处为Jmeter容器间 docker (curl)
 # https://docs.docker.com/develop/sdk/
 # https://docs.docker.com/engine/api/v1.24/
-def runJmeterTestDocker(reulstPath):
+def runJmeterTestDocker(reulstPath,taskId):
   # 初始化执行jmeter集群
   ## 创建jmeter slave web api
-  response = BytesIO()
-  curl = pycurl.Curl()
-  curl.setopt(pycurl.WRITEFUNCTION, response.write)
-  curl.setopt(pycurl.URL,"http:/v1.24/services/create")
-  curl.setopt(pycurl.HTTPHEADER,['Content-Type: application/json','Accept-Charset: UTF-8'])
-  curl.setopt(pycurl.UNIX_SOCKET_PATH,"/var/run/docker.sock")
-  my_json_data = json.load(open("jmeter-slave-service.json"))
-  curl.setopt(pycurl.POSTFIELDS,json.dumps(my_json_data))
-  curl.perform()
-  the_page = response.getvalue()
-  print(the_page)
-  response.close()
+  curlSlaveCall('jmeter-slave.json',reulstPath,taskId)
+ 
   ## 创建jmeter master web api
+  curlMasterCall('jmeter-master.json',reulstPath,taskId)
+
   ## 启动slave master
+
+# def curlSlaveCall(jsonFile,reulstPath):
+#   response = BytesIO()
+#   curl = pycurl.Curl()
+#   curl.setopt(pycurl.WRITEFUNCTION, response.write)
+#   curl.setopt(pycurl.URL,"http:/v1.24/containers/create?name=jmeter-slave")
+#   curl.setopt(pycurl.HTTPHEADER,['Content-Type: application/json','Accept-Charset: UTF-8'])
+#   curl.setopt(pycurl.UNIX_SOCKET_PATH,"/var/run/docker.sock")
+#   # curl.setopt(pycurl.p)
+#   my_json_data = json.load(open(jsonFile))
+#   curl.setopt(pycurl.POSTFIELDS,json.dumps(my_json_data))
+#   curl.perform()
+#   the_page = response.getvalue()
+#   print(the_page)
+#   response.close()
+
+
+# def curlMasterCall(jsonFile,reulstPath):
+#   response = BytesIO()
+#   curl = pycurl.Curl()
+#   curl.setopt(pycurl.WRITEFUNCTION, response.write)
+#   curl.setopt(pycurl.URL,"http:/v1.24/containers/create?name=jmeter-master")
+#   curl.setopt(pycurl.HTTPHEADER,['Content-Type: application/json','Accept-Charset: UTF-8'])
+#   curl.setopt(pycurl.UNIX_SOCKET_PATH,"/var/run/docker.sock")
+#   my_json_data = json.load(open(jsonFile))
+#   my_json_data['Cmd'][1] = reulstPath
+#   my_json_data['Cmd'][3] = 'jmeter-slave'
+#   my_json_data['Cmd'][7] = '/jmeter_log/x.csv'
+#   curl.setopt(pycurl.POSTFIELDS,json.dumps(my_json_data))
+#   curl.perform()
+#   the_page = response.getvalue()
+#   print(the_page)
+#   response.close()
 
 # 此处为Jmeter容器间 docker  (python docker)
 # https://docs.docker.com/develop/sdk/
+# https://docs.docker.com/engine/api/v1.39/#tag/Service
 def runJmeterTestDocker1(reulstPath):
   # 初始化执行jmeter集群
   ## 创建jmeter slave web api
@@ -304,6 +330,17 @@ def runJmeterTestDocker1(reulstPath):
   client.close
   ## 创建jmeter master web api
   ## 启动slave master
+
+
+def curlSlaveCall(jsonFile,reulstPath,taskId):
+  client = docker.from_env()
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'/home/niaoshuai/docker_mnt': {'bind': '/jmeter_log', 'mode': 'rw'}})
+  client.close
+
+def curlMasterCall(jsonFile,reulstPath,taskId):
+  client = docker.from_env()
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+reulstPath+'/test.jmx'+' -R jmeter-slave -l '+reulstPath+'/test.jmx'+' -X',name="jmeter-master-"+taskId,volumes={'/home/niaoshuai/docker_mnt': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave":"jmeter-slave"})
+  client.close
 
 def runJmeterTest1(reulstPath):
   #cmd = "jmeter -n -t %s -l %s -e -o %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv',reulstPath+'/resultDir')
@@ -338,9 +375,10 @@ if '__main__' == __name__:
       reulstPath = makeResultPath(now)
       tree = read_demo('templete.jmx')
       tree = set_data(tree,data=response["content"])
-      tree.write(reulstPath+'/testData.jmx')
+      tree.write(reulstPath+'/test.jmx')
       setTaskStatus(taskId, 2, "build task script")
-      runJmeterTest(reulstPath)
+      # runJmeterTest(reulstPath)
+      runJmeterTestDocker(reulstPath,taskId)
       setTaskStatus(taskId, 3, "excute script sucess")
       try:
         resultContent = readResult(reulstPath+'/result.csv')

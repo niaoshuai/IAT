@@ -1,5 +1,4 @@
 {
-    "Names":["/jmeter-slave1"],
     "Image": "registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0",
     "Cmd": [
         "-j",
@@ -7,5 +6,5 @@
     ],
     "HostConfig": {
         "Binds": ["/home/niaoshuai/docker_mnt:/jmeter_log:rw"]
-    }   
+    }
 }

@@ -3,6 +3,9 @@ import sys,requests,os,subprocess,json,importlib
 import pandas as pd
 import xml.etree.ElementTree as ET
 from datetime import datetime
+import pycurl
+from io import BytesIO
+import docker
 
 
 default_encoding = 'utf-8'
@@ -262,11 +265,45 @@ def makeResultPath(now):
     os.makedirs(reulstPath)
   return reulstPath
 
-def runJmeterTest(reulstPath):
-  #cmd = "jmeter -n -t %s -l %s -e -o %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv',reulstPath+'/resultDir')
-  cmd = "jmeter -n -t %s -l %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv')
-  print(cmd)
-  subprocess.call(cmd, shell=True)
+# 此处为Jmeter命令 link 到容器
+# def runJmeterTest(reulstPath):
+#   #cmd = "jmeter -n -t %s -l %s -e -o %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv',reulstPath+'/resultDir')
+#   cmd = "jmeter -n -t %s -l %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv')
+#   print(cmd)
+#   subprocess.call(cmd, shell=True)
+
+# 此处为Jmeter容器间 docker (curl)
+# https://docs.docker.com/develop/sdk/
+# https://docs.docker.com/engine/api/v1.24/
+def runJmeterTestDocker(reulstPath):
+  # 初始化执行jmeter集群
+  ## 创建jmeter slave web api
+  response = BytesIO()
+  curl = pycurl.Curl()
+  curl.setopt(pycurl.WRITEFUNCTION, response.write)
+  curl.setopt(pycurl.URL,"http:/v1.24/services/create")
+  curl.setopt(pycurl.HTTPHEADER,['Content-Type: application/json','Accept-Charset: UTF-8'])
+  curl.setopt(pycurl.UNIX_SOCKET_PATH,"/var/run/docker.sock")
+  my_json_data = json.load(open("jmeter-slave-service.json"))
+  curl.setopt(pycurl.POSTFIELDS,json.dumps(my_json_data))
+  curl.perform()
+  the_page = response.getvalue()
+  print(the_page)
+  response.close()
+  ## 创建jmeter master web api
+  ## 启动slave master
+
+# 此处为Jmeter容器间 docker  (python docker)
+# https://docs.docker.com/develop/sdk/
+def runJmeterTestDocker1(reulstPath):
+  # 初始化执行jmeter集群
+  ## 创建jmeter slave web api
+  
+  client = docker.from_env()
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',kwargs="")
+  client.close
+  ## 创建jmeter master web api
+  ## 启动slave master
 
 def runJmeterTest1(reulstPath):
   #cmd = "jmeter -n -t %s -l %s -e -o %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv',reulstPath+'/resultDir')

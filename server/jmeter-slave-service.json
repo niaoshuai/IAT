@@ -1,0 +1,20 @@
+{
+    "Name": "jmeter-slave",
+    "TaskTemplate": {
+      "ContainerSpec": {
+        "Image": "registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0",
+        "Cmd": [
+            "-j",
+            "/jmeter_log/slave1.log"
+        ],
+        "HostConfig": {
+            "Binds": ["/home/niaoshuai/docker_mnt:/jmeter_log:rw"]
+        }
+      },
+      "RestartPolicy": {
+        "Condition": "on-failure",
+        "Delay": 10000000000,
+        "MaxAttempts": 10
+      }
+    }
+  }

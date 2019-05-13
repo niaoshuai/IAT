@@ -860,12 +860,13 @@ def debugSample():
               debugResult = 1
         if rowData.asserts_type == 2:
           ## JSON 断言
+          print(res.text)
           for item in asserts_data:
             debugResult = 2
             assertPathList = item["key"] ## 校验key
             ## 排除$.
             if(assertPathList.startswith('$.')):
-              assertPathList = assertPathList[:2] ## 截取前两位
+              assertPathList = assertPathList[2:] ## 截取前两位
             print(assertPathList)
             assertPathList = assertPathList.split('.')
             pathLen = len(assertPathList)

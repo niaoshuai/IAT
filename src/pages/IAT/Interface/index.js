@@ -2,95 +2,108 @@
 /* eslint-disable no-useless-escape */
 import React, { Component } from 'react';
 import {
-  Layout, Tree ,Select,Icon,Menu,message,Input,Card,Divider,Col,Button,Radio,Spin,Switch,Tooltip,Empty
+  Layout,
+  Tree,
+  Select,
+  Icon,
+  Menu,
+  message,
+  Input,
+  Card,
+  Divider,
+  Col,
+  Button,
+  Radio,
+  Spin,
+  Switch,
+  Tooltip,
+  Empty,
 } from 'antd';
 import AceEditor from 'react-ace';
-import {connect} from 'dva';
+import { connect } from 'dva';
 import JSONPretty from 'react-json-pretty';
-import {setTage,getTage} from '@/services/tags';
+import { setTage, getTage } from '@/services/tags';
 import Resizable from 're-resizable';
-import styles from './index.less'
+import styles from './index.less';
 
 import 'brace/mode/java';
 import 'brace/theme/dracula';
 
-const {
-  Content, Sider,
-} = Layout;
+const { Content, Sider } = Layout;
 const { TreeNode } = Tree;
-const {Option} = Select;
+const { Option } = Select;
 const InputGroup = Input.Group;
 const { TextArea } = Input;
 
-@connect(({ system,interfaceCase,loading }) => ({
+@connect(({ system, interfaceCase, loading }) => ({
   system,
   interfaceCase,
-  loading:loading.effects['interfaceCase/queryTreeInfo'],
-  debugLoading:loading.effects['interfaceCase/queryDebugSample'],
+  loading: loading.effects['interfaceCase/queryTreeInfo'],
+  debugLoading: loading.effects['interfaceCase/queryDebugSample'],
 }))
 class Interface extends Component {
   // 构造
-    constructor(props) {
-      super(props);
-      // 初始状态
-      this.state = {
-        projectList:[],
-        project:null,
-        clickId:null,
-        caseId:null,
-        treeList:[],
-        extractList:[],
-        rightClickItem:null,
-        debugDomain:null,
-        selectNoteType:null,
-        infoParamsFormatType:null,
-        infoName:'',
-        infoPath:'',
-        infoMethod:'GET',
-        infoParams:null,
-        infoAssertData:null,
-        infoExtractData:null,
-        autoExpandParent:true,
-        showAddHeader:false,
-        hasPreShell:false,
-        hasPostShell:false,
-        debugHeader:[],
-        info:{
-          "name": "",
-          "path": "",
-          "method": "GET",
-          "paramType": 1,
-          "params": [],
-          "asserts": {
-            "assertsType": 1,
-            "assertData": [],
-          },
-          "extract": {
-            "extractType": 0,
-            "extractData": [],
-          },
-          "preShellType":0,
-          "preShellData":'',
-          "postShellType":0,
-          "postShellData":''
+  constructor(props) {
+    super(props);
+    // 初始状态
+    this.state = {
+      projectList: [],
+      project: null,
+      clickId: null,
+      caseId: null,
+      treeList: [],
+      extractList: [],
+      rightClickItem: null,
+      debugDomain: 'http://192.168.11.206:8081',
+      selectNoteType: null,
+      infoParamsFormatType: null,
+      infoName: '',
+      infoPath: '',
+      infoMethod: 'GET',
+      infoParams: null,
+      infoAssertData: null,
+      infoExtractData: null,
+      autoExpandParent: true,
+      showAddHeader: false,
+      hasPreShell: false,
+      hasPostShell: false,
+      debugHeader: [],
+      info: {
+        name: '',
+        path: '',
+        method: 'GET',
+        paramType: 1,
+        params: [],
+        asserts: {
+          assertsType: 1,
+          assertData: [],
         },
-        debugData:{},
-        debugResult:0,
-      };
-      this.setDomTreeBoxRef = ref => (this.treeBox = ref);
+        extract: {
+          extractType: 0,
+          extractData: [],
+        },
+        preShellType: 0,
+        preShellData: '',
+        postShellType: 0,
+        postShellData: '',
+      },
+      debugData: {},
+      debugParams: [],
+      debugResult: 0,
+    };
+    this.setDomTreeBoxRef = ref => (this.treeBox = ref);
+  }
 
-    }
-
-  componentWillMount(){
+  componentWillMount() {
     const params = this.props.location.search;
     if (params.indexOf('?') !== -1) {
       const caseId = params.substr(1);
-      if (caseId){
-        this.setState({caseId})
+      if (caseId) {
+        this.setState({ caseId });
       }
-      this.queryProjectList(caseId)
-    }else {
-      this.queryProjectList()
+      this.queryProjectList(caseId);
+    } else {
+      this.queryProjectList();
     }
   }
 
@@ -133,7 +146,7 @@ class Interface extends Component {
           </Menu.Item>
         </Menu>
       );
-    return (this.state.rightClickItem && menu);
+    return this.state.rightClickItem && menu;
   }
 
   handleRightMenuClick = e => {
@@ -159,356 +172,359 @@ class Interface extends Component {
     }
   };
 
-  treeToList=(tree)=>{
-    const listData = [{
-      id:tree[0].id,
-      name:tree[0].name,
-      noteType:tree[0].noteType,
-      index_id:tree[0].index_id,
-      pid:0,
-    }]
-    const loop = (data,fatherPid) =>data.children.forEach((item)=>{
-      listData.push({
-        id:item.id,
-        name:item.name,
-        noteType:item.noteType,
-        index_id:item.index_id,
-        pid:fatherPid,
-      })
-      if(item.children&&item.children.length>0){
-        loop(item,item.id)
-      }
-    })
-    loop(tree[0],tree[0].id)
-    return listData
+  treeToList = tree => {
+    const listData = [
+      {
+        id: tree[0].id,
+        name: tree[0].name,
+        noteType: tree[0].noteType,
+        index_id: tree[0].index_id,
+        pid: 0,
+      },
+    ];
+    const loop = (data, fatherPid) =>
+      data.children.forEach(item => {
+        listData.push({
+          id: item.id,
+          name: item.name,
+          noteType: item.noteType,
+          index_id: item.index_id,
+          pid: fatherPid,
+        });
+        if (item.children && item.children.length > 0) {
+          loop(item, item.id);
+        }
+      });
+    loop(tree[0], tree[0].id);
+    return listData;
   };
 
-  onChangeTest=(newValue)=>{
-    this.setState({preShellData:newValue},()=>{
-      console.log("xxxxxxxxx",newValue);
-    })
+  onChangeTest = newValue => {
+    this.setState({ preShellData: newValue }, () => {});
     // const editor = this.ace.editor; // The editor object is from Ace's API
     // console.log(editor.getValue()); // Outputs the value of the editor
-  }
-
-  handleAddCase=()=>{
-    const clickId = this.state.rightClickItem.dataRef.id;
-    const {treeList} = this.state;
-    const listData = this.treeToList(treeList)
-    listData.push({
-      id:null,
-      name:'',
-      type:'case',
-      noteType:0,
-      index_id:99,
-      pid:clickId,
-    })
-    const listToTree = pid =>{
-      const result = [];
-      listData.forEach((item)=>{
-        if (pid !==null && item.pid === pid){
-          result.push({
-            id:item.id,
-            name:item.name,
-            index_id:item.index_id,
-            type:item.type,
-            noteType:item.noteType,
-            children:listToTree(item.id),
-          })
-        }
-      })
-      return result
-    }
-    const newTree = listToTree(0)
-    this.setState({
-      treeList:newTree,
-      expandedKeys:[clickId.toString()],
-      clickId,
-      autoExpandParent:true
-    },()=>this.clearMenu())
   };
 
-  handleAddSubFolder=()=>{
+  handleAddCase = () => {
     const clickId = this.state.rightClickItem.dataRef.id;
-    const {treeList} = this.state;
-    const listData = this.treeToList(treeList)
+    const { treeList } = this.state;
+    const listData = this.treeToList(treeList);
     listData.push({
-      id:null,
-      name:'',
-      type:'folder',
-      noteType:0,
-      index_id:99,
-      pid:clickId,
-    })
-    const listToTree = pid =>{
+      id: null,
+      name: '',
+      type: 'case',
+      noteType: 0,
+      index_id: 99,
+      pid: clickId,
+    });
+    const listToTree = pid => {
       const result = [];
-      listData.forEach((item)=>{
-        if (pid !==null && item.pid === pid){
+      listData.forEach(item => {
+        if (pid !== null && item.pid === pid) {
           result.push({
-            id:item.id,
-            name:item.name,
-            index_id:item.index_id,
-            type:item.type,
-            noteType:item.noteType,
-            children:listToTree(item.id),
-          })
+            id: item.id,
+            name: item.name,
+            index_id: item.index_id,
+            type: item.type,
+            noteType: item.noteType,
+            children: listToTree(item.id),
+          });
         }
-      })
-      return result
-    }
-    const newTree = listToTree(0)
-    this.setState({
-      treeList:newTree,
-      expandedKeys:[clickId.toString()],
-      clickId,
-      autoExpandParent:true
-    },()=>this.clearMenu())
+      });
+      return result;
+    };
+    const newTree = listToTree(0);
+    this.setState(
+      {
+        treeList: newTree,
+        expandedKeys: [clickId.toString()],
+        clickId,
+        autoExpandParent: true,
+      },
+      () => this.clearMenu()
+    );
   };
 
-  handleDeleteSubFolder=()=>{
-    const deleteId = this.state.rightClickItem.dataRef.id
-    const {dispatch} = this.props;
-    dispatch({
-      type:'interfaceCase/queryDeleteFolder',
-      payload:{
-        id:this.state.rightClickItem.dataRef.id,
-      }
-    })
-      .then(()=>{
-        this.queryTreeList(this.state.project)
-        this.clearMenu()
-        this.clearSelect(deleteId)
-      })
-  }
+  handleAddSubFolder = () => {
+    const clickId = this.state.rightClickItem.dataRef.id;
+    const { treeList } = this.state;
+    const listData = this.treeToList(treeList);
+    listData.push({
+      id: null,
+      name: '',
+      type: 'folder',
+      noteType: 0,
+      index_id: 99,
+      pid: clickId,
+    });
+    const listToTree = pid => {
+      const result = [];
+      listData.forEach(item => {
+        if (pid !== null && item.pid === pid) {
+          result.push({
+            id: item.id,
+            name: item.name,
+            index_id: item.index_id,
+            type: item.type,
+            noteType: item.noteType,
+            children: listToTree(item.id),
+          });
+        }
+      });
+      return result;
+    };
+    const newTree = listToTree(0);
+    this.setState(
+      {
+        treeList: newTree,
+        expandedKeys: [clickId.toString()],
+        clickId,
+        autoExpandParent: true,
+      },
+      () => this.clearMenu()
+    );
+  };
 
-  hanldeDeleteCase=()=>{
+  handleDeleteSubFolder = () => {
     const deleteId = this.state.rightClickItem.dataRef.id;
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryDeleteCase',
-      payload:{
-        id:deleteId,
-      }
-    })
-      .then(()=>{
-        this.queryTreeList(this.state.project)
-        this.clearMenu()
-        this.clearSelect(deleteId)
-      })
-  }
+      type: 'interfaceCase/queryDeleteFolder',
+      payload: {
+        id: this.state.rightClickItem.dataRef.id,
+      },
+    }).then(() => {
+      this.queryTreeList(this.state.project);
+      this.clearMenu();
+      this.clearSelect(deleteId);
+    });
+  };
 
-  handleCopyCase=()=>{
-    const {dispatch} = this.props;
+  hanldeDeleteCase = () => {
+    const deleteId = this.state.rightClickItem.dataRef.id;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryCopyCase',
-      payload:{
-        id:this.state.rightClickItem.dataRef.id,
-      }
-    })
-      .then(()=>{
-        this.queryTreeList(this.state.project)
-        this.clearMenu()
-      })
-  }
+      type: 'interfaceCase/queryDeleteCase',
+      payload: {
+        id: deleteId,
+      },
+    }).then(() => {
+      this.queryTreeList(this.state.project);
+      this.clearMenu();
+      this.clearSelect(deleteId);
+    });
+  };
 
-  queryProjectList=(caseId=null)=>{
-    const {dispatch} = this.props
+  handleCopyCase = () => {
+    const { dispatch } = this.props;
     dispatch({
-      type:'system/queryProjectList',
-      payload:{
-        status:'1',
-      }
-    })
-      .then(()=>{
-        const {system} = this.props
-        this.setState({
-          projectList:system.projectList,
-        },()=>{
-          if(caseId){
-            this.querySampleInfo(caseId,true)
-          }else {
-            const localStorage = getTage()
-            if (localStorage){
-              const project = localStorage.projectId
-              this.setState({project},()=>{
-                this.handleProjectChange(this.state.project)
-              })
+      type: 'interfaceCase/queryCopyCase',
+      payload: {
+        id: this.state.rightClickItem.dataRef.id,
+      },
+    }).then(() => {
+      this.queryTreeList(this.state.project);
+      this.clearMenu();
+    });
+  };
+
+  queryProjectList = (caseId = null) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'system/queryProjectList',
+      payload: {
+        status: '1',
+      },
+    }).then(() => {
+      const { system } = this.props;
+      this.setState(
+        {
+          projectList: system.projectList,
+        },
+        () => {
+          if (caseId) {
+            this.querySampleInfo(caseId, true);
+          } else {
+            const localStorage = getTage();
+            if (localStorage) {
+              const project = localStorage.projectId;
+              this.setState({ project }, () => {
+                this.handleProjectChange(this.state.project);
+              });
             }
           }
-        })
-      })
-  };
-
-  queryExtractList=(projectId)=>{
-    const {dispatch} = this.props
-    dispatch({
-      type:'interfaceCase/queryExtractList',
-      payload:{
-        id:projectId,
-      }
-    })
-      .then(()=>{
-        const {interfaceCase} = this.props
-        this.setState({
-          extractList:interfaceCase.extractList,
-        })
-      })
-  };
-
-  queryTreeList=(id,isRef=false)=>{
-    const {dispatch} = this.props;
-    dispatch({
-      type:'interfaceCase/queryTreeList',
-      payload:{
-        id,
-      },
-    })
-      .then(()=>{
-        const {interfaceCase} = this.props;
-        this.setState({treeList:interfaceCase.treeList},()=>{
-          if(isRef){
-            this.setState({
-              selectedKeys:[this.state.caseId],
-              expandedKeys:[this.state.caseId]
-            })
-          }
-        })
-      })
-  };
-
-  querySampleInfo=(id,isRef=false)=>{
-    const {dispatch} = this.props;
-    dispatch({
-      type:'interfaceCase/querySampleInfo',
-      payload:{
-        id,
-      },
-    })
-      .then(()=>{
-        const {interfaceCase} = this.props;
-        if (interfaceCase.sampleInfo){
-          this.setState({
-            info:interfaceCase.sampleInfo,
-            selectNoteType:2,
-            infoName:interfaceCase.sampleInfo.name,
-            project:interfaceCase.sampleInfo.projectId,
-            infoPath:interfaceCase.sampleInfo.path,
-            infoMethod:interfaceCase.sampleInfo.method,
-            infoParams:interfaceCase.sampleInfo.params,
-            infoParamsFormatType:interfaceCase.sampleInfo.paramType,
-            infoAssertType:interfaceCase.sampleInfo.asserts.assertsType,
-            infoExtractType:interfaceCase.sampleInfo.extract.extractType,
-            infoAssertData:interfaceCase.sampleInfo.asserts.assertData,
-            infoExtractData:interfaceCase.sampleInfo.extract.extractData,
-            hasPreShell:interfaceCase.sampleInfo.preShellType === 1||false,
-            preShellData:interfaceCase.sampleInfo.preShellData,
-            hasPostShell:interfaceCase.sampleInfo.postShellType === 1 || false,
-            postShellData:interfaceCase.sampleInfo.postShellData,
-          },()=>{
-            if(isRef){
-              setTage({projectId:this.state.project})
-              this.queryTreeList(this.state.project,true)
-              this.queryExtractList(this.state.project)
-            }
-          })
-        }else {
-          this.setState({
-            info:{
-              "name": "",
-              "path": "",
-              "method": "GET",
-              "paramType": 1,
-              "params": [],
-              "asserts": {
-                "assertsType": 1,
-                "assertData": [],
-              },
-              "extract": {
-                "extractType": 0,
-                "extractData": [],
-              },
-              "preShellType":0,
-              "preShellData":'',
-              "postShellType":0,
-              "postShellData":''
-            }
-          })
         }
-      })
+      );
+    });
   };
 
-  queryTreeInfo=(id)=>{
-    const {dispatch} = this.props;
+  queryExtractList = projectId => {
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryTreeInfo',
-      payload:{
+      type: 'interfaceCase/queryExtractList',
+      payload: {
+        id: projectId,
+      },
+    }).then(() => {
+      const { interfaceCase } = this.props;
+      this.setState({
+        extractList: interfaceCase.extractList,
+      });
+    });
+  };
+
+  queryTreeList = (id, isRef = false) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'interfaceCase/queryTreeList',
+      payload: {
         id,
       },
-    })
-      .then(()=>{
-        const {interfaceCase} = this.props;
-        let {info}= this.state;
-        info.name = interfaceCase.infoData.name
-        this.setState({info,infoName:interfaceCase.infoData.name})
-      })
-  }
-
-  handleProjectChange=(value)=>{
-    this.setState({project:value},
-      ()=>{
-        setTage({projectId:this.state.project})
-        this.queryTreeList(value)
-        this.queryExtractList(value)
-      }
-    )
+    }).then(() => {
+      const { interfaceCase } = this.props;
+      this.setState({ treeList: interfaceCase.treeList }, () => {
+        if (isRef) {
+          this.setState({
+            selectedKeys: [this.state.caseId],
+            expandedKeys: [this.state.caseId],
+          });
+        }
+      });
+    });
   };
 
-  onDrop=(info)=>{
+  querySampleInfo = (id, isRef = false) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'interfaceCase/querySampleInfo',
+      payload: {
+        id,
+      },
+    }).then(() => {
+      const { interfaceCase } = this.props;
+      if (interfaceCase.sampleInfo) {
+        this.setState(
+          {
+            info: interfaceCase.sampleInfo,
+            selectNoteType: 2,
+            infoName: interfaceCase.sampleInfo.name,
+            project: interfaceCase.sampleInfo.projectId,
+            infoPath: interfaceCase.sampleInfo.path,
+            infoMethod: interfaceCase.sampleInfo.method,
+            infoParams: interfaceCase.sampleInfo.params,
+            infoParamsFormatType: interfaceCase.sampleInfo.paramType,
+            infoAssertType: interfaceCase.sampleInfo.asserts.assertsType,
+            infoExtractType: interfaceCase.sampleInfo.extract.extractType,
+            infoAssertData: interfaceCase.sampleInfo.asserts.assertData,
+            infoExtractData: interfaceCase.sampleInfo.extract.extractData,
+            hasPreShell: interfaceCase.sampleInfo.preShellType === 1 || false,
+            preShellData: interfaceCase.sampleInfo.preShellData,
+            hasPostShell: interfaceCase.sampleInfo.postShellType === 1 || false,
+            postShellData: interfaceCase.sampleInfo.postShellData,
+          },
+          () => {
+            if (isRef) {
+              setTage({ projectId: this.state.project });
+              this.queryTreeList(this.state.project, true);
+              this.queryExtractList(this.state.project);
+            }
+          }
+        );
+      } else {
+        this.setState({
+          info: {
+            name: '',
+            path: '',
+            method: 'GET',
+            paramType: 1,
+            params: [],
+            asserts: {
+              assertsType: 1,
+              assertData: [],
+            },
+            extract: {
+              extractType: 0,
+              extractData: [],
+            },
+            preShellType: 0,
+            preShellData: '',
+            postShellType: 0,
+            postShellData: '',
+          },
+        });
+      }
+    });
+  };
+
+  queryTreeInfo = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'interfaceCase/queryTreeInfo',
+      payload: {
+        id,
+      },
+    }).then(() => {
+      const { interfaceCase } = this.props;
+      let { info } = this.state;
+      info.name = interfaceCase.infoData.name;
+      this.setState({ info, infoName: interfaceCase.infoData.name });
+    });
+  };
+
+  handleProjectChange = value => {
+    this.setState({ project: value }, () => {
+      setTage({ projectId: this.state.project });
+      this.queryTreeList(value);
+      this.queryExtractList(value);
+    });
+  };
+
+  onDrop = info => {
     const dropKey = info.node.props.eventKey;
     const dragKey = info.dragNode.props.eventKey;
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateTreeIndex',
-      payload:{
+      type: 'interfaceCase/queryUpdateTreeIndex',
+      payload: {
         dropKey,
-        dragKey
-      }
-    })
-      .then(()=>{
-        this.queryTreeList(this.state.project)
-      })
-  }
-
-  onSelect = (selectedKeys,info) => {
-    if (selectedKeys.length>0){
-      this.setState({
-        selectedKeys,
-        selectNoteType:info.node.props.dataRef.noteType,
-        infoName:'',
-        infoPath:'',
-        infoMethod:'GET',
-        infoParams:null,
-        infoAssertType:1,
-        infoExtractType:0,
-        infoAssertData:null,
-        infoExtractData:null,
-        hasPreShell:false,
-        preShellData:'',
-        hasPostShell:false,
-        postShellData:'',
-      },()=>{
-        this.queryTreeInfo(this.state.selectedKeys[0])
-        if(this.state.selectNoteType === 2){
-          this.querySampleInfo(this.state.selectedKeys[0])
-          this.queryExtractList(this.state.project)
-        }
-      })
-    }
-  }
-
-  onCheck = (checkedKeys, info) => {
-    console.log('onCheck', checkedKeys, info);
+        dragKey,
+      },
+    }).then(() => {
+      this.queryTreeList(this.state.project);
+    });
   };
+
+  onSelect = (selectedKeys, info) => {
+    if (selectedKeys.length > 0) {
+      this.setState(
+        {
+          selectedKeys,
+          selectNoteType: info.node.props.dataRef.noteType,
+          infoName: '',
+          infoPath: '',
+          infoMethod: 'GET',
+          infoParams: null,
+          infoAssertType: 1,
+          infoExtractType: 0,
+          infoAssertData: null,
+          infoExtractData: null,
+          hasPreShell: false,
+          preShellData: '',
+          hasPostShell: false,
+          postShellData: '',
+        },
+        () => {
+          this.queryTreeInfo(this.state.selectedKeys[0]);
+          if (this.state.selectNoteType === 2) {
+            this.querySampleInfo(this.state.selectedKeys[0]);
+            this.queryExtractList(this.state.project);
+          }
+        }
+      );
+    }
+  };
+
+  onCheck = () => {};
 
   getXY = ele => {
     const scrollTop = this.treeBox.scrollTop;
@@ -527,7 +543,7 @@ class Interface extends Component {
     return { x: left, y: top };
   };
 
-  handleOnRightClick=(e)=>{
+  handleOnRightClick = e => {
     const xy = this.getXY(e.event.currentTarget);
     const x = xy.x;
     const y = xy.y;
@@ -538,120 +554,115 @@ class Interface extends Component {
         pageY: y + 12,
         id: e.node.props.eventKey,
         noteType: e.node.props.noteType,
-        dataRef:e.node.props.dataRef,
+        dataRef: e.node.props.dataRef,
       },
     });
   };
 
-  clearMenu=()=>{
-    this.setState({rightClickItem:null})
+  clearMenu = () => {
+    this.setState({ rightClickItem: null });
   };
 
-  clearSelect=(id)=>{
-    if (this.state.selectedKeys){
-      if(this.state.selectedKeys[0] === id.toString()){
-        this.setState({selectedKeys:null})
+  clearSelect = id => {
+    if (this.state.selectedKeys) {
+      if (this.state.selectedKeys[0] === id.toString()) {
+        this.setState({ selectedKeys: null });
       }
     }
-  }
+  };
 
-  submitAddFolder=(value)=>{
-    if (!value){
-      message.warning('名称不可为空')
-      this.queryTreeList(this.state.project)
-      return
+  submitAddFolder = value => {
+    if (!value) {
+      message.warning('名称不可为空');
+      this.queryTreeList(this.state.project);
+      return;
     }
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryAddSubFolder',
-      payload:{
-        id:this.state.clickId,
-        name:value
-      }
-    })
-      .then(()=>{
-        this.queryTreeList(this.state.project)
-      })
+      type: 'interfaceCase/queryAddSubFolder',
+      payload: {
+        id: this.state.clickId,
+        name: value,
+      },
+    }).then(() => {
+      this.queryTreeList(this.state.project);
+    });
   };
 
-  submitAddCase=(value)=>{
-    if (!value){
-      message.warning('名称不可为空')
-      this.queryTreeList(this.state.project)
-      return
+  submitAddCase = value => {
+    if (!value) {
+      message.warning('名称不可为空');
+      this.queryTreeList(this.state.project);
+      return;
     }
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryAddCase',
-      payload:{
-        id:this.state.clickId,
-        name:value
-      }
-    })
-      .then(()=>{
-        this.queryTreeList(this.state.project)
-      })
+      type: 'interfaceCase/queryAddCase',
+      payload: {
+        id: this.state.clickId,
+        name: value,
+      },
+    }).then(() => {
+      this.queryTreeList(this.state.project);
+    });
   };
 
-  hanldeNameChange=(e)=>{
-    this.setState({infoName:e.target.value},()=>{
-      const {dispatch} = this.props;
+  hanldeNameChange = e => {
+    this.setState({ infoName: e.target.value }, () => {
+      const { dispatch } = this.props;
       dispatch({
-        type:'interfaceCase/queryUpdateFolderName',
-        payload:{
-          id:this.state.selectedKeys[0],
-          name:this.state.infoName,
+        type: 'interfaceCase/queryUpdateFolderName',
+        payload: {
+          id: this.state.selectedKeys[0],
+          name: this.state.infoName,
         },
-      })
-        .then(()=>{
-          this.queryTreeList(this.state.project)
-        })
-    })
+      }).then(() => {
+        this.queryTreeList(this.state.project);
+      });
+    });
   };
 
-  handleMethodChange=(value)=>{
-    let {info} = this.state;
+  handleMethodChange = value => {
+    let { info } = this.state;
     info.method = value;
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateSample',
-      payload:{
-        id:this.state.selectedKeys[0],
+      type: 'interfaceCase/queryUpdateSample',
+      payload: {
+        id: this.state.selectedKeys[0],
         info,
-      }
-    })
-      .then(()=>{
-        this.querySampleInfo(this.state.selectedKeys[0])
-      })
+      },
+    }).then(() => {
+      this.querySampleInfo(this.state.selectedKeys[0]);
+    });
   };
 
-  handleAssertTypeChange=(e)=>{
-    let {info} = this.state;
+  handleAssertTypeChange = e => {
+    let { info } = this.state;
     info.asserts.assertsType = e.target.value;
-    if(e.target.value ===2){
+    if (e.target.value === 2) {
       info.asserts.assertData = [
         {
-          id:new Date().getTime(),
-          key:'',
-          value:'',
-        }
+          id: new Date().getTime(),
+          key: '',
+          value: '',
+        },
       ];
     }
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateSample',
-      payload:{
-        id:this.state.selectedKeys[0],
+      type: 'interfaceCase/queryUpdateSample',
+      payload: {
+        id: this.state.selectedKeys[0],
         info,
-      }
-    })
-      .then(()=>{
-        this.querySampleInfo(this.state.selectedKeys[0])
-      })
+      },
+    }).then(() => {
+      this.querySampleInfo(this.state.selectedKeys[0]);
+    });
   };
 
-  handleParamsFormatTypeChange=(e)=>{
-    let {info} = this.state;
+  handleParamsFormatTypeChange = e => {
+    let { info } = this.state;
     info.paramType = e.target.value;
 
     // if(e.target.value ===2){
@@ -663,384 +674,450 @@ class Interface extends Component {
     //     }
     //   ];
     // }
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateSample',
-      payload:{
-        id:this.state.selectedKeys[0],
+      type: 'interfaceCase/queryUpdateSample',
+      payload: {
+        id: this.state.selectedKeys[0],
         info,
-      }
-    })
-      .then(()=>{
-        this.querySampleInfo(this.state.selectedKeys[0])
-      })
+      },
+    }).then(() => {
+      this.querySampleInfo(this.state.selectedKeys[0]);
+    });
   };
 
-  handleExtractTypeChange=(e)=>{
-    let {info} = this.state;
+  handleExtractTypeChange = e => {
+    let { info } = this.state;
     info.extract.extractType = e.target.value;
-    if(e.target.value ===1){
+    if (e.target.value === 1) {
       info.extract.extractData = [
         {
-          id:new Date().getTime(),
-          key:'',
-          value:'',
-        }
+          id: new Date().getTime(),
+          key: '',
+          value: '',
+        },
       ];
+    } else {
+      // clear extractData
+      info.extract.extractData = [];
     }
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateSample',
-      payload:{
-        id:this.state.selectedKeys[0],
+      type: 'interfaceCase/queryUpdateSample',
+      payload: {
+        id: this.state.selectedKeys[0],
         info,
-      }
-    })
-      .then(()=>{
-        this.querySampleInfo(this.state.selectedKeys[0])
-      })
+      },
+    }).then(() => {
+      this.querySampleInfo(this.state.selectedKeys[0]);
+    });
   };
 
-  handleAssertDataChange=()=>{
-    let {info} = this.state;
+  handleAssertDataChange = () => {
+    let { info } = this.state;
     info.asserts.assertData = this.state.infoAssertData;
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateSample',
-      payload:{
-        id:this.state.selectedKeys[0],
+      type: 'interfaceCase/queryUpdateSample',
+      payload: {
+        id: this.state.selectedKeys[0],
         info,
-      }
-    })
-      .then(()=>{
-        this.querySampleInfo(this.state.selectedKeys[0])
-      })
+      },
+    }).then(() => {
+      this.querySampleInfo(this.state.selectedKeys[0]);
+    });
   };
 
-  handleExtractDataChange=()=>{
-    let {info} = this.state;
+  handleExtractDataChange = () => {
+    let { info } = this.state;
     info.extract.extractData = this.state.infoExtractData;
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateSample',
-      payload:{
-        id:this.state.selectedKeys[0],
+      type: 'interfaceCase/queryUpdateSample',
+      payload: {
+        id: this.state.selectedKeys[0],
         info,
-      }
-    })
-      .then(()=>{
-        this.querySampleInfo(this.state.selectedKeys[0])
-      })
+      },
+    }).then(() => {
+      this.querySampleInfo(this.state.selectedKeys[0]);
+    });
   };
 
-  queryUpdateSample=(key,value)=>{
-    let {info} = this.state;
+  queryUpdateSample = (key, value) => {
+    let { info } = this.state;
     info[key] = value;
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateSample',
-      payload:{
-        id:this.state.selectedKeys[0],
+      type: 'interfaceCase/queryUpdateSample',
+      payload: {
+        id: this.state.selectedKeys[0],
         info,
-      }
-    })
-      .then(()=>{
-        this.querySampleInfo(this.state.selectedKeys[0])
-      })
-  }
+      },
+    }).then(() => {
+      this.querySampleInfo(this.state.selectedKeys[0]);
+    });
+  };
 
-  hanldePathChange=(e)=>{
-    let {info} = this.state;
+  hanldePathChange = e => {
+    let { info } = this.state;
     info.path = e.target.value;
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type:'interfaceCase/queryUpdateSample',
-      payload:{
-        id:this.state.selectedKeys[0],
+      type: 'interfaceCase/queryUpdateSample',
+      payload: {
+        id: this.state.selectedKeys[0],
         info,
-      }
-    })
-      .then(()=>{
-        this.querySampleInfo(this.state.selectedKeys[0])
-      })
+      },
+    }).then(() => {
+      this.querySampleInfo(this.state.selectedKeys[0]);
+    });
   };
 
-  handleAddParams=()=>{
+  handleAddParams = () => {
     const emptyItem = {
-      id:new Date().getTime(),
-      type:false,
-      key:'',
-      value:'',
-    }
-    if (this.state.infoParams){
-      const newAttr = this.state.infoParams.concat(emptyItem)
-      this.setState({
-        infoParams:newAttr,
-      },()=>this.queryUpdateSample('params',this.state.infoParams))
-    }else {
-      this.setState({
-        infoParams:[emptyItem],
-      },()=>this.queryUpdateSample('params',this.state.infoParams))
+      id: new Date().getTime(),
+      type: false,
+      key: '',
+      value: '',
+    };
+    if (this.state.infoParams) {
+      const newAttr = this.state.infoParams.concat(emptyItem);
+      this.setState(
+        {
+          infoParams: newAttr,
+        },
+        () => this.queryUpdateSample('params', this.state.infoParams)
+      );
+    } else {
+      this.setState(
+        {
+          infoParams: [emptyItem],
+        },
+        () => this.queryUpdateSample('params', this.state.infoParams)
+      );
     }
   };
 
-  handleAddHeader=()=>{
+  handleAddHeader = () => {
     const emptyItem = {
-      id:new Date().getTime(),
-      key:'',
-      value:'',
-    }
-    if (this.state.debugHeader){
-      const newAttr = this.state.debugHeader.concat(emptyItem)
+      id: new Date().getTime(),
+      key: '',
+      value: '',
+    };
+    if (this.state.debugHeader) {
+      const newAttr = this.state.debugHeader.concat(emptyItem);
       this.setState({
-        debugHeader:newAttr,
-      })
-    }else {
+        debugHeader: newAttr,
+      });
+    } else {
       this.setState({
-        debugHeader:[emptyItem],
-      })
+        debugHeader: [emptyItem],
+      });
     }
   };
 
-  handeAssertData=()=>{
+  handeAssertData = () => {
     const emptyItem = {
-      id:new Date().getTime(),
-      value:'',
-    }
-    if (this.state.infoAssertData){
-      const newAttr = this.state.infoAssertData.concat(emptyItem)
-      this.setState({
-        infoAssertData:newAttr,
-      },()=>this.handleAssertDataChange())
-    }else {
-      this.setState({
-        infoAssertData:[emptyItem],
-      },()=>this.handleAssertDataChange())
+      id: new Date().getTime(),
+      value: '',
+    };
+    if (this.state.infoAssertData) {
+      const newAttr = this.state.infoAssertData.concat(emptyItem);
+      this.setState(
+        {
+          infoAssertData: newAttr,
+        },
+        () => this.handleAssertDataChange()
+      );
+    } else {
+      this.setState(
+        {
+          infoAssertData: [emptyItem],
+        },
+        () => this.handleAssertDataChange()
+      );
     }
   };
 
-  handleParamsKeyChange=(e,index)=>{
-    const {infoParams} = this.state;
-    infoParams[index].key = e.target.value
-    this.setState({infoParams})
-  }
+  handleParamsKeyChange = (e, index) => {
+    const { infoParams } = this.state;
+    infoParams[index].key = e.target.value;
+    this.setState({ infoParams });
+  };
 
-  handleAssertJsonKeyChange=(e,index)=>{
-    const {infoAssertData} = this.state;
-    infoAssertData[index].key = e.target.value
-    this.setState({infoAssertData})
-  }
+  handleAssertJsonKeyChange = (e, index) => {
+    const { infoAssertData } = this.state;
+    infoAssertData[index].key = e.target.value;
+    this.setState({ infoAssertData });
+  };
 
-  handleExtractJsonKeyChange=(e,index)=>{
-    const {infoExtractData} = this.state;
-    infoExtractData[index].key = e.target.value
-    this.setState({infoExtractData})
-  }
+  handleExtractJsonKeyChange = (e, index) => {
+    const { infoExtractData } = this.state;
+    infoExtractData[index].key = e.target.value;
+    this.setState({ infoExtractData });
+  };
 
-  handleHeaderKeyChange=(e,index)=>{
-    const {debugHeader} = this.state;
-    debugHeader[index].key = e.target.value
-    this.setState({debugHeader})
-  }
+  handleHeaderKeyChange = (e, index) => {
+    const { debugHeader } = this.state;
+    debugHeader[index].key = e.target.value;
+    this.setState({ debugHeader });
+  };
 
-  handleParamsValueChange=(e,index)=>{
-    const {infoParams} = this.state;
-    infoParams[index].value = e.target.value
-    this.setState({infoParams})
-  }
+  handleParamsValueChange = (e, index) => {
+    const { infoParams } = this.state;
+    infoParams[index].value = e.target.value;
+    this.setState({ infoParams });
+  };
 
-  handleParamsSelectValueChange=(e,index)=>{
-    const {infoParams} = this.state;
-    infoParams[index].value = e
-    this.setState({infoParams},()=>this.queryUpdateSample('params',this.state.infoParams))
-  }
+  handleParamsSelectValueChange = (e, index) => {
+    const { infoParams } = this.state;
+    infoParams[index].value = e;
+    this.setState({ infoParams }, () => this.queryUpdateSample('params', this.state.infoParams));
+  };
 
-  handleSetPreShellChange=()=>{
-    const {hasPreShell} = this.state;
-    this.setState({hasPreShell:!hasPreShell},()=>this.queryUpdateSample('preShellType',this.state.hasPreShell?1:0))
-  }
+  handleSetPreShellChange = () => {
+    const { hasPreShell } = this.state;
+    this.setState({ hasPreShell: !hasPreShell }, () =>
+      this.queryUpdateSample('preShellType', this.state.hasPreShell ? 1 : 0)
+    );
+  };
 
-  handleSetPostShellChange=()=>{
-    const {hasPostShell} = this.state;
-    this.setState({hasPostShell:!hasPostShell},()=>this.queryUpdateSample('postShellType',this.state.hasPostShell?1:0))
-  }
+  handleSetPostShellChange = () => {
+    const { hasPostShell } = this.state;
+    this.setState({ hasPostShell: !hasPostShell }, () =>
+      this.queryUpdateSample('postShellType', this.state.hasPostShell ? 1 : 0)
+    );
+  };
 
-  handleParamsTypeChange=(e,index)=>{
-    const {infoParams} = this.state;
-    infoParams[index].type = e
-    infoParams[index].value = ""
-    this.setState({infoParams},()=>this.queryUpdateSample('params',this.state.infoParams))
-  }
+  handleParamsTypeChange = (e, index) => {
+    const { infoParams } = this.state;
+    infoParams[index].type = e;
+    infoParams[index].value = '';
+    this.setState({ infoParams }, () => this.queryUpdateSample('params', this.state.infoParams));
+  };
 
-  handleAssertJsonValueChange=(e,index)=>{
-    const {infoAssertData} = this.state;
-    infoAssertData[index].value = e.target.value
-    this.setState({infoAssertData})
-  }
+  handleAssertJsonValueChange = (e, index) => {
+    const { infoAssertData } = this.state;
+    infoAssertData[index].value = e.target.value;
+    this.setState({ infoAssertData });
+  };
 
-  handleExtractJsonValueChange=(e,index)=>{
-    const {infoExtractData} = this.state;
-    infoExtractData[index].value = e.target.value
-    this.setState({infoExtractData})
-  }
+  handleExtractJsonValueChange = (e, index) => {
+    const { infoExtractData } = this.state;
+    infoExtractData[index].value = e.target.value;
+    this.setState({ infoExtractData });
+  };
 
-  handleHeaderValueChange=(e,index)=>{
-    const {debugHeader} = this.state;
-    debugHeader[index].value = e.target.value
-    this.setState({debugHeader})
-  }
+  handleHeaderValueChange = (e, index) => {
+    const { debugHeader } = this.state;
+    debugHeader[index].value = e.target.value;
+    this.setState({ debugHeader });
+  };
 
-  onAssertDataChange=(e,index)=>{
-    const {infoAssertData} = this.state;
-    infoAssertData[index].value = e.target.value
-    this.setState({infoAssertData})
-  }
+  onAssertDataChange = (e, index) => {
+    const { infoAssertData } = this.state;
+    infoAssertData[index].value = e.target.value;
+    this.setState({ infoAssertData });
+  };
 
-  handleDeleteParams =(index)=>{
+  handleDeleteParams = index => {
     const oldAttr = this.state.infoParams;
-    if(index === 0 && oldAttr.length===1){
-      this.setState({
-        infoParams:null
-      },()=>{
-        this.queryUpdateSample('params',this.state.infoParams)
-      })
-    }else {
-      oldAttr.splice(index,1)
-      this.setState({
-        infoParams:oldAttr
-      },()=>{
-        this.queryUpdateSample('params',this.state.infoParams)
-      })
+    if (index === 0 && oldAttr.length === 1) {
+      this.setState(
+        {
+          infoParams: null,
+        },
+        () => {
+          this.queryUpdateSample('params', this.state.infoParams);
+        }
+      );
+    } else {
+      oldAttr.splice(index, 1);
+      this.setState(
+        {
+          infoParams: oldAttr,
+        },
+        () => {
+          this.queryUpdateSample('params', this.state.infoParams);
+        }
+      );
     }
   };
 
-  handleDeleteHeader =(index)=>{
+  handleDeleteHeader = index => {
     const oldAttr = this.state.debugHeader;
-    if(index === 0 && oldAttr.length===1){
+    if (index === 0 && oldAttr.length === 1) {
       this.setState({
-        debugHeader:null
-      })
-    }else {
-      oldAttr.splice(index,1)
+        debugHeader: null,
+      });
+    } else {
+      oldAttr.splice(index, 1);
       this.setState({
-        debugHeader:oldAttr
-      })
+        debugHeader: oldAttr,
+      });
     }
   };
 
-  handleDeleteSection =(index)=>{
+  handleDeleteSection = index => {
     const oldAttr = this.state.infoAssertData;
-    if(index === 0 && oldAttr.length===1){
-      this.setState({
-        infoAssertData:[]
-      },()=>this.handleAssertDataChange())
-    }else {
-      oldAttr.splice(index,1)
-      this.setState({
-        infoAssertData:oldAttr
-      },()=>this.handleAssertDataChange())
+    if (index === 0 && oldAttr.length === 1) {
+      this.setState(
+        {
+          infoAssertData: [],
+        },
+        () => this.handleAssertDataChange()
+      );
+    } else {
+      oldAttr.splice(index, 1);
+      this.setState(
+        {
+          infoAssertData: oldAttr,
+        },
+        () => this.handleAssertDataChange()
+      );
     }
   };
 
-  handlePreShellChange=(e)=>{
-    if (e){
-      this.queryUpdateSample('preShellData',this.state.preShellData)
+  handlePreShellChange = e => {
+    if (e) {
+      this.queryUpdateSample('preShellData', this.state.preShellData);
     }
   };
 
-  handlePostShellChange=(e)=>{
-    if (e){
-      this.queryUpdateSample('postShellData',this.state.postShellData)
+  handlePostShellChange = e => {
+    if (e) {
+      this.queryUpdateSample('postShellData', this.state.postShellData);
     }
   };
 
-  onExpandTree=(expandedKeys)=>{
-    this.setState({expandedKeys,autoExpandParent:false})
+  onExpandTree = expandedKeys => {
+    this.setState({ expandedKeys, autoExpandParent: false });
   };
 
-  handleDebug=()=>{
-    const {dispatch} = this.props;
-    let headers = {}
-    if (this.state.debugHeader&&this.state.debugHeader.length>0){
-      this.state.debugHeader.forEach((item)=>{
-        headers[item.key] = item.value
-      })
+  handleDebug = () => {
+    const { dispatch } = this.props;
+    let headers = {};
+    if (this.state.debugHeader && this.state.debugHeader.length > 0) {
+      this.state.debugHeader.forEach(item => {
+        headers[item.key] = item.value;
+      });
     }
     dispatch({
-      type:'interfaceCase/queryDebugSample',
-      payload:{
-        id:this.state.selectedKeys[0],
-        domain:this.state.debugDomain,
+      type: 'interfaceCase/queryDebugSample',
+      payload: {
+        id: this.state.selectedKeys[0],
+        domain: this.state.debugDomain,
         headers,
-      }
-    })
-      .then(()=>{
-        const {interfaceCase} = this.props;
-        this.setState({
-          debugData:interfaceCase.debugInfo.debugData,
-          debugResult:interfaceCase.debugInfo.debugResult,
-        })
-      })
+      },
+    }).then(() => {
+      const { interfaceCase } = this.props;
+      this.setState({
+        debugData: interfaceCase.debugInfo.debugData,
+        debugParams: interfaceCase.debugInfo.debugParams,
+        debugResult: interfaceCase.debugInfo.debugResult,
+      });
+    });
   };
 
-  handleShowAddDebugHeader=()=>{
-    this.setState({showAddHeader:!this.state.showAddHeader,debugHeader:[]})
-  }
+  handleShowAddDebugHeader = () => {
+    this.setState({ showAddHeader: !this.state.showAddHeader, debugHeader: [] });
+  };
 
   render() {
     const {
-      projectList,project,treeList,rightClickItem,expandedKeys,hasPreShell,hasPostShell,
-      selectedKeys,autoExpandParent,selectNoteType,infoName,infoPath,preShellData,postShellData,
-      infoMethod,infoParams,infoAssertType,infoExtractType,infoAssertData,infoParamsFormatType,
-      infoExtractData,debugDomain,debugData,showAddHeader,debugHeader,debugResult,extractList
+      projectList,
+      project,
+      treeList,
+      rightClickItem,
+      expandedKeys,
+      hasPreShell,
+      hasPostShell,
+      selectedKeys,
+      autoExpandParent,
+      selectNoteType,
+      infoName,
+      infoPath,
+      preShellData,
+      postShellData,
+      infoMethod,
+      infoParams,
+      infoAssertType,
+      infoExtractType,
+      infoAssertData,
+      infoParamsFormatType,
+      infoExtractData,
+      debugDomain,
+      debugData,
+      debugParams,
+      showAddHeader,
+      debugHeader,
+      debugResult,
+      extractList,
     } = this.state;
-    const {loading,debugLoading} = this.props;
-    const loop = data => data.map((item) => {
-      if (item.noteType === 1) {
+    const { loading, debugLoading } = this.props;
+    const loop = data =>
+      data.map(item => {
+        if (item.noteType === 1) {
+          return (
+            <TreeNode
+              icon={<Icon type="folder" theme="filled" style={{ color: '#3498db' }} />}
+              key={item.id}
+              dataRef={item}
+              title={item.name}
+              noteType={item.noteType}
+            >
+              {item.children && loop(item.children)}
+            </TreeNode>
+          );
+        }
+        if (item.noteType === 0) {
+          if (item.type === 'folder') {
+            return (
+              <TreeNode
+                icon={<Icon type="folder" theme="filled" style={{ color: '#3498db' }} />}
+                selectable={false}
+                title={
+                  <Input
+                    size="small"
+                    style={{ width: 100 }}
+                    autoFocus
+                    onBlur={e => this.submitAddFolder(e.target.value)}
+                    onPressEnter={e => this.submitAddFolder(e.target.value)}
+                  />
+                }
+                key="0-0-1"
+              />
+            );
+          }
+          if (item.type === 'case') {
+            return (
+              <TreeNode
+                icon={<Icon type="api" theme="filled" />}
+                selectable={false}
+                title={
+                  <Input
+                    size="small"
+                    style={{ width: 100 }}
+                    autoFocus
+                    onBlur={e => this.submitAddCase(e.target.value)}
+                    onPressEnter={e => this.submitAddCase(e.target.value)}
+                  />
+                }
+                key="0-0-1"
+              />
+            );
+          }
+        }
         return (
           <TreeNode
-            icon={<Icon type="folder" theme="filled" style={{ color: '#3498db' }} />}
+            icon={<Icon type="api" theme="filled" />}
             key={item.id}
             dataRef={item}
             title={item.name}
             noteType={item.noteType}
-          >
-            {item.children&&loop(item.children)}
-          </TreeNode>
+          />
         );
-      }
-      if(item.noteType === 0){
-        if (item.type === 'folder'){
-          return(
-            <TreeNode
-              icon={<Icon type="folder" theme="filled" style={{ color: '#3498db' }} />}
-              selectable={false}
-              title={<Input size="small" style={{width:100}} autoFocus onBlur={(e)=>this.submitAddFolder(e.target.value)} onPressEnter={(e)=>this.submitAddFolder(e.target.value)} />}
-              key="0-0-1"
-            />
-          )
-        }
-        if (item.type === 'case'){
-          return(
-            <TreeNode
-              icon={<Icon type="api" theme="filled" />}
-              selectable={false}
-              title={<Input size="small" style={{width:100}} autoFocus onBlur={(e)=>this.submitAddCase(e.target.value)} onPressEnter={(e)=>this.submitAddCase(e.target.value)} />}
-              key="0-0-1"
-            />
-          )
-        }
-      }
-      return (
-        <TreeNode
-          icon={<Icon type="api" theme="filled" />}
-          key={item.id}
-          dataRef={item}
-          title={item.name}
-          noteType={item.noteType}
-        />
-      );
-    });
+      });
     // const Empty = (
     //   <div>
     //     <Card bordered={false} className={styles.right_empty_container}>
@@ -1057,15 +1134,17 @@ class Interface extends Component {
           <div className={styles.item_content_container}>
             <Input
               placeholder="标题名称"
-              size='small'
+              size="small"
               value={infoName}
-              onChange={(e)=>{this.setState({infoName:e.target.value})}}
-              onBlur={(e)=>this.hanldeNameChange(e)}
+              onChange={e => {
+                this.setState({ infoName: e.target.value });
+              }}
+              onBlur={e => this.hanldeNameChange(e)}
               className={styles.item_item}
             />
           </div>
         </div>
-        <Divider  />
+        <Divider />
       </Card>
     );
     const Case = (
@@ -1078,10 +1157,12 @@ class Interface extends Component {
           <div className={styles.item_content_container}>
             <Input
               placeholder="标题名称"
-              size='small'
+              size="small"
               value={infoName}
-              onChange={(e)=>{this.setState({infoName:e.target.value})}}
-              onBlur={(e)=>this.hanldeNameChange(e)}
+              onChange={e => {
+                this.setState({ infoName: e.target.value });
+              }}
+              onBlur={e => this.hanldeNameChange(e)}
               className={styles.item_item}
             />
           </div>
@@ -1092,10 +1173,14 @@ class Interface extends Component {
             <span>前置shell：</span>
           </div>
           <div className={styles.item_content_container}>
-            <Switch size="small" checked={hasPreShell} onChange={()=>this.handleSetPreShellChange()} />
+            <Switch
+              size="small"
+              checked={hasPreShell}
+              onChange={() => this.handleSetPreShellChange()}
+            />
           </div>
         </div>
-        {hasPreShell&&(
+        {hasPreShell && (
           <div className={styles.item_container}>
             <div className={styles.item_label_container}>
               <span />
@@ -1107,10 +1192,10 @@ class Interface extends Component {
                 name="preShellInput"
                 editorProps={{ $blockScrolling: true }}
                 defaultValue={preShellData}
-                value={preShellData||undefined}
+                value={preShellData || undefined}
                 height="300px"
-                onChange={(newValue)=>this.setState({preShellData:newValue})}
-                onBlur={(newValue)=>this.handlePreShellChange(newValue)}
+                onChange={newValue => this.setState({ preShellData: newValue })}
+                onBlur={newValue => this.handlePreShellChange(newValue)}
               />
             </div>
           </div>
@@ -1121,40 +1206,46 @@ class Interface extends Component {
           </div>
           <div className={styles.item_content_container}>
             <InputGroup className={styles.item_item} compact>
-              <Select placeholder="method" size='small' value={infoMethod} style={{width:'20%'}} onChange={(value)=>this.handleMethodChange(value)}>
+              <Select
+                placeholder="method"
+                size="small"
+                value={infoMethod}
+                style={{ width: '20%' }}
+                onChange={value => this.handleMethodChange(value)}
+              >
                 <Option value="POST">POST</Option>
                 <Option value="GET">GET</Option>
               </Select>
               <Input
-                style={{width:'80%'}}
+                style={{ width: '80%' }}
                 placeholder="请求路径eg:/path/path"
-                size='small'
+                size="small"
                 value={infoPath}
-                onChange={(e)=>{this.setState({infoPath:e.target.value})}}
-                onBlur={(e)=>this.hanldePathChange(e)}
+                onChange={e => {
+                  this.setState({ infoPath: e.target.value });
+                }}
+                onBlur={e => this.hanldePathChange(e)}
               />
             </InputGroup>
-
           </div>
         </div>
-        {infoMethod==='POST'&&(
+        {infoMethod === 'POST' && (
           <div className={styles.item_container}>
             <div className={styles.item_label_container}>
               <span>参数类型：</span>
             </div>
             <div className={styles.item_content_container}>
-              <Radio.Group value={infoParamsFormatType} onChange={(e)=>this.handleParamsFormatTypeChange(e)}>
-                <Radio value={1}>
-                  x-www-form-urlencoded
-                </Radio>
+              <Radio.Group
+                value={infoParamsFormatType}
+                onChange={e => this.handleParamsFormatTypeChange(e)}
+              >
+                <Radio value={1}>x-www-form-urlencoded</Radio>
                 <Radio value={2}>
                   <Tooltip title="设置该类型参数后，将不支持任务中的全局默认参数设置">
                     <a>json</a>
                   </Tooltip>
                 </Radio>
-                <Radio value={3}>
-                  form-data
-                </Radio>
+                <Radio value={3}>form-data</Radio>
               </Radio.Group>
             </div>
           </div>
@@ -1164,52 +1255,87 @@ class Interface extends Component {
             <span>请求参数：</span>
           </div>
           <div className={styles.item_content_container}>
-            {infoParams&&infoParams.map((item,index)=>(
-              <InputGroup size='small' key={item.id} className={styles.item_attrs_container}>
-                <Col span={6}>
-                  <Input placeholder="属性名" value={item.key} onChange={(e)=>this.handleParamsKeyChange(e,index)} onBlur={()=>this.queryUpdateSample('params',this.state.infoParams)} />
-                </Col>
-                <Col span={10}>
-                  {item.type&&(
-                    <Select
-                      placeholder="选择自定义参数"
-                      value={item.value}
-                      style={{width:'100%'}}
-                      size='small'
-                      onChange={(e)=>this.handleParamsSelectValueChange(e,index)}
+            {infoParams &&
+              infoParams.map((item, index) => (
+                <InputGroup size="small" key={item.id} className={styles.item_attrs_container}>
+                  <Col span={6}>
+                    <Input
+                      placeholder="属性名"
+                      value={item.key}
+                      onChange={e => this.handleParamsKeyChange(e, index)}
+                      onBlur={() => this.queryUpdateSample('params', this.state.infoParams)}
+                    />
+                  </Col>
+                  <Col span={10}>
+                    {item.type && (
+                      <Select
+                        placeholder="选择自定义参数"
+                        value={item.value}
+                        style={{ width: '100%' }}
+                        size="small"
+                        onChange={e => this.handleParamsSelectValueChange(e, index)}
+                      >
+                        {extractList &&
+                          extractList.map(extractItem => {
+                            const extractKey = extractItem.extractKey
+                              .replace('${', '')
+                              .replace('}', '');
+                            return (
+                              <Option
+                                key={extractItem.id}
+                                value={`$\{${extractItem.extractKey}\}`}
+                                title={extractItem.caseName}
+                                disabled={
+                                  infoExtractData.length > 0 &&
+                                  extractKey === infoExtractData[0].key
+                                }
+                              >
+                                <span
+                                  style={
+                                    infoExtractData.length > 0 &&
+                                    extractKey === infoExtractData[0].key
+                                      ? {}
+                                      : { color: 'blue' }
+                                  }
+                                >
+                                  {extractKey}
+                                </span>
+                              </Option>
+                            );
+                          })}
+                      </Select>
+                    )}
+                    {!item.type && (
+                      <Input
+                        placeholder="属性值"
+                        value={item.value}
+                        onChange={e => this.handleParamsValueChange(e, index)}
+                        onBlur={() => this.queryUpdateSample('params', this.state.infoParams)}
+                      />
+                    )}
+                  </Col>
+                  <Col span={2}>
+                    <Tooltip
+                      title={`开启后，可下拉选择已定义的参数。(shell中定义的参数无需开启，直接输入： \${xxx} 获取)`}
                     >
-                      {
-                        extractList&&extractList.map((extractItem)=>{
-                          const extractKey = extractItem.extractKey.replace("${","").replace("}","")
-                          return(
-                            <Option
-                              key={extractItem.id}
-                              value={`$\{${extractItem.extractKey}\}`}
-                              title={extractItem.caseName}
-                              disabled={infoExtractData.length>0 && extractKey===infoExtractData[0].key}
-                            >
-                              <span style={(infoExtractData.length>0 && extractKey===infoExtractData[0].key)?{}:{color:'blue'}}>{extractKey}</span>
-                            </Option>
-                          )
-                        })
-                      }
-                    </Select>
-                  )}
-                  {!item.type&&(
-                    <Input placeholder="属性值" value={item.value} onChange={(e)=>this.handleParamsValueChange(e,index)} onBlur={()=>this.queryUpdateSample('params',this.state.infoParams)} />
-                  )}
-                </Col>
-                <Col span={2}>
-                  <Tooltip title={`开启后，可下拉选择已定义的参数。(shell中定义的参数无需开启，直接输入： \${xxx} 获取)`}>
-                    <Switch size="small" checked={item.type} onChange={(e)=>this.handleParamsTypeChange(e,index)} />
-                  </Tooltip>
-                </Col>
-                <Col span={1}>
-                  <Icon type="minus-circle" onClick={()=>this.handleDeleteParams(index)} />
-                </Col>
-              </InputGroup>
-            ))}
-            <Button type="dashed" size="small" onClick={()=>this.handleAddParams()} className={styles.item_item}>
+                      <Switch
+                        size="small"
+                        checked={item.type}
+                        onChange={e => this.handleParamsTypeChange(e, index)}
+                      />
+                    </Tooltip>
+                  </Col>
+                  <Col span={1}>
+                    <Icon type="minus-circle" onClick={() => this.handleDeleteParams(index)} />
+                  </Col>
+                </InputGroup>
+              ))}
+            <Button
+              type="dashed"
+              size="small"
+              onClick={() => this.handleAddParams()}
+              className={styles.item_item}
+            >
               <Icon type="plus" /> Add field
             </Button>
           </div>
@@ -1219,10 +1345,14 @@ class Interface extends Component {
             <span>后置shell：</span>
           </div>
           <div className={styles.item_content_container}>
-            <Switch size="small" checked={hasPostShell} onChange={()=>this.handleSetPostShellChange()} />
+            <Switch
+              size="small"
+              checked={hasPostShell}
+              onChange={() => this.handleSetPostShellChange()}
+            />
           </div>
         </div>
-        {hasPostShell&&(
+        {hasPostShell && (
           <div className={styles.item_container}>
             <div className={styles.item_label_container}>
               <span />
@@ -1234,10 +1364,10 @@ class Interface extends Component {
                 name="postShellInput"
                 editorProps={{ $blockScrolling: true }}
                 defaultValue={postShellData}
-                value={postShellData||undefined}
+                value={postShellData || undefined}
                 height="300px"
-                onChange={(newValue)=>this.setState({postShellData:newValue})}
-                onBlur={(newValue)=>this.handlePostShellChange(newValue)}
+                onChange={newValue => this.setState({ postShellData: newValue })}
+                onBlur={newValue => this.handlePostShellChange(newValue)}
               />
             </div>
           </div>
@@ -1248,13 +1378,9 @@ class Interface extends Component {
             <span>校验类型：</span>
           </div>
           <div className={styles.item_content_container}>
-            <Radio.Group value={infoAssertType} onChange={(e)=>this.handleAssertTypeChange(e)}>
-              <Radio value={1}>
-                响应断言
-              </Radio>
-              <Radio value={2}>
-                JSON断言
-              </Radio>
+            <Radio.Group value={infoAssertType} onChange={e => this.handleAssertTypeChange(e)}>
+              <Radio value={1}>响应断言</Radio>
+              <Radio value={2}>JSON断言</Radio>
             </Radio.Group>
           </div>
         </div>
@@ -1263,41 +1389,64 @@ class Interface extends Component {
             <span>校验值：</span>
           </div>
           <div className={styles.item_content_container}>
-            {infoAssertType===1&&(
+            {infoAssertType === 1 && (
               <div>
                 <div className={styles.item_item}>
-                  {infoAssertData&&infoAssertData.map((item,index)=>(
-                    <div style={{marginBottom:10,display:'flex',flexDirection:'row'}} key={item.id}>
-                      <TextArea
-                        placeholder={`需要校验的返回值.eg: "code":0 `}
-                        value={item.value}
-                        autosize={{ minRows: 2, maxRows: 6 }}
-                        onChange={(e)=>this.onAssertDataChange(e,index)}
-                        onBlur={()=>this.handleAssertDataChange()}
-                      />
-                      <div className={styles.section_delete}>
-                        <Icon type="minus-circle" onClick={()=>this.handleDeleteSection(index)} />
+                  {infoAssertData &&
+                    infoAssertData.map((item, index) => (
+                      <div
+                        style={{ marginBottom: 10, display: 'flex', flexDirection: 'row' }}
+                        key={item.id}
+                      >
+                        <TextArea
+                          placeholder={`需要校验的返回值.eg: "code":0 `}
+                          value={item.value}
+                          autosize={{ minRows: 2, maxRows: 6 }}
+                          onChange={e => this.onAssertDataChange(e, index)}
+                          onBlur={() => this.handleAssertDataChange()}
+                        />
+                        <div className={styles.section_delete}>
+                          <Icon
+                            type="minus-circle"
+                            onClick={() => this.handleDeleteSection(index)}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
-                <Button type="dashed" onClick={()=>this.handeAssertData()} className={styles.item_item} style={{height:60 }}>
+                <Button
+                  type="dashed"
+                  onClick={() => this.handeAssertData()}
+                  className={styles.item_item}
+                  style={{ height: 60 }}
+                >
                   <Icon type="plus" /> Add field
                 </Button>
               </div>
             )}
-            {infoAssertType ===2&&(
+            {infoAssertType === 2 && (
               <div>
-                {infoAssertData&&infoAssertData.map((item,index)=>(
-                  <InputGroup size='small' className={styles.item_attrs_container} key={item.id}>
-                    <Col span={10}>
-                      <Input placeholder="json路径.eg: content.testdata.xxx " value={item.key} onChange={(e)=>this.handleAssertJsonKeyChange(e,index)} onBlur={()=>this.handleAssertDataChange()} />
-                    </Col>
-                    <Col span={10}>
-                      <Input placeholder="字段值" value={item.value} onChange={(e)=>this.handleAssertJsonValueChange(e,index)} onBlur={()=>this.handleAssertDataChange()} />
-                    </Col>
-                  </InputGroup>
-                ))}
+                {infoAssertData &&
+                  infoAssertData.map((item, index) => (
+                    <InputGroup size="small" className={styles.item_attrs_container} key={item.id}>
+                      <Col span={10}>
+                        <Input
+                          placeholder="json路径.eg: content.testdata.xxx "
+                          value={item.key}
+                          onChange={e => this.handleAssertJsonKeyChange(e, index)}
+                          onBlur={() => this.handleAssertDataChange()}
+                        />
+                      </Col>
+                      <Col span={10}>
+                        <Input
+                          placeholder="字段值"
+                          value={item.value}
+                          onChange={e => this.handleAssertJsonValueChange(e, index)}
+                          onBlur={() => this.handleAssertDataChange()}
+                        />
+                      </Col>
+                    </InputGroup>
+                  ))}
               </div>
             )}
           </div>
@@ -1308,13 +1457,9 @@ class Interface extends Component {
             <span>提取方式：</span>
           </div>
           <div className={styles.item_content_container}>
-            <Radio.Group value={infoExtractType} onChange={(e)=>this.handleExtractTypeChange(e)}>
-              <Radio value={0}>
-                不提取
-              </Radio>
-              <Radio value={1}>
-                JSON提取
-              </Radio>
+            <Radio.Group value={infoExtractType} onChange={e => this.handleExtractTypeChange(e)}>
+              <Radio value={0}>不提取</Radio>
+              <Radio value={1}>JSON提取</Radio>
             </Radio.Group>
           </div>
         </div>
@@ -1323,18 +1468,30 @@ class Interface extends Component {
             <span>定义参数：</span>
           </div>
           <div className={styles.item_content_container}>
-            {infoExtractType ===1&&(
+            {infoExtractType === 1 && (
               <div>
-                {infoExtractData&&infoExtractData.map((item,index)=>(
-                  <InputGroup size='small' className={styles.item_attrs_container} key={item.id}>
-                    <Col span={10}>
-                      <Input placeholder="参数名称" style={{color:'blue'}} value={item.key} onChange={(e)=>this.handleExtractJsonKeyChange(e,index)} onBlur={()=>this.handleExtractDataChange()} />
-                    </Col>
-                    <Col span={10}>
-                      <Input placeholder="json路径.eg: content.testdata.xxx " value={item.value} onChange={(e)=>this.handleExtractJsonValueChange(e,index)} onBlur={()=>this.handleExtractDataChange()} />
-                    </Col>
-                  </InputGroup>
-                ))}
+                {infoExtractData &&
+                  infoExtractData.map((item, index) => (
+                    <InputGroup size="small" className={styles.item_attrs_container} key={item.id}>
+                      <Col span={10}>
+                        <Input
+                          placeholder="参数名称"
+                          style={{ color: 'blue' }}
+                          value={item.key}
+                          onChange={e => this.handleExtractJsonKeyChange(e, index)}
+                          onBlur={() => this.handleExtractDataChange()}
+                        />
+                      </Col>
+                      <Col span={10}>
+                        <Input
+                          placeholder="json路径.eg: content.testdata.xxx "
+                          value={item.value}
+                          onChange={e => this.handleExtractJsonValueChange(e, index)}
+                          onBlur={() => this.handleExtractDataChange()}
+                        />
+                      </Col>
+                    </InputGroup>
+                  ))}
               </div>
             )}
           </div>
@@ -1342,7 +1499,7 @@ class Interface extends Component {
       </Card>
     );
     const Debug = (
-      <Spin spinning={debugLoading||false}>
+      <Spin spinning={debugLoading || false}>
         <Card bordered={false}>
           <div className={styles.debug_label_container}>
             <span>调试域名：</span>
@@ -1351,34 +1508,52 @@ class Interface extends Component {
             <div className={styles.debug_content_container}>
               <Input
                 placeholder="eg:https://app.xxxx.com"
-                size='small'
+                size="small"
                 value={debugDomain}
-                onChange={(e)=>{this.setState({debugDomain:e.target.value})}}
+                onChange={e => {
+                  this.setState({ debugDomain: e.target.value });
+                }}
               />
             </div>
-            <Button type="primary" size="small" onClick={()=>this.handleDebug()}>调试</Button>
+            <Button type="primary" size="small" onClick={() => this.handleDebug()}>
+              调试
+            </Button>
           </div>
           <div className={styles.debug_header_container}>
             <div className={styles.debug_add_header}>
-              <a onClick={()=>this.handleShowAddDebugHeader()}>请求头设置</a>
+              <a onClick={() => this.handleShowAddDebugHeader()}>请求头设置</a>
             </div>
           </div>
-          {showAddHeader&&(
+          {showAddHeader && (
             <div className={styles.debug_header_content}>
-              {debugHeader&&debugHeader.map((item,index)=>(
-                <InputGroup size='small' key={item.id} className={styles.item_attrs_container}>
-                  <Col span={8}>
-                    <Input placeholder="属性名" value={item.key} onChange={(e)=>this.handleHeaderKeyChange(e,index)} />
-                  </Col>
-                  <Col span={10}>
-                    <Input placeholder="属性值" value={item.value} onChange={(e)=>this.handleHeaderValueChange(e,index)} />
-                  </Col>
-                  <div className={styles.action_icon}>
-                    <Icon type="minus-circle" onClick={()=>this.handleDeleteHeader(index)} />
-                  </div>
-                </InputGroup>
-              ))}
-              <Button type="dashed" size="small" onClick={()=>this.handleAddHeader()} className={styles.item_item}>
+              {debugHeader &&
+                debugHeader.map((item, index) => (
+                  <InputGroup size="small" key={item.id} className={styles.item_attrs_container}>
+                    <Col span={8}>
+                      <Input
+                        placeholder="属性名"
+                        value={item.key}
+                        onChange={e => this.handleHeaderKeyChange(e, index)}
+                      />
+                    </Col>
+                    <Col span={10}>
+                      <Input
+                        placeholder="属性值"
+                        value={item.value}
+                        onChange={e => this.handleHeaderValueChange(e, index)}
+                      />
+                    </Col>
+                    <div className={styles.action_icon}>
+                      <Icon type="minus-circle" onClick={() => this.handleDeleteHeader(index)} />
+                    </div>
+                  </InputGroup>
+                ))}
+              <Button
+                type="dashed"
+                size="small"
+                onClick={() => this.handleAddHeader()}
+                className={styles.item_item}
+              >
                 <Icon type="plus" /> Add field
               </Button>
             </div>
@@ -1388,9 +1563,7 @@ class Interface extends Component {
           </div>
           <div className={styles.item_container}>
             <div className={styles.debug_response_container}>
-              {debugResult!==0&&(
-                <JSONPretty id="json-pretty" data={debugData} />
-              )}
+              {debugResult !== 0 && <JSONPretty id="json-pretty" data={debugData} />}
             </div>
           </div>
           <div className={styles.debug_label_container}>
@@ -1398,18 +1571,26 @@ class Interface extends Component {
           </div>
           <div className={styles.item_container}>
             <div className={styles.debug_assert_container}>
-              {debugResult===1&&(
+              {debugResult === 1 && (
                 <div className={styles.success}>
-                  <Icon type="check-circle" theme="filled" style={{fontSize:22}} />
+                  <Icon type="check-circle" theme="filled" style={{ fontSize: 22 }} />
                   <div>测试通过</div>
                 </div>
               )}
-              {debugResult===2&&(
+              {debugResult === 2 && (
                 <div className={styles.fail}>
-                  <Icon type="close-circle" theme="filled" style={{fontSize:22}} />
+                  <Icon type="close-circle" theme="filled" style={{ fontSize: 22 }} />
                   <div>测试失败</div>
                 </div>
               )}
+            </div>
+          </div>
+          <div className={styles.debug_label_container}>
+            <span>参数化结果：</span>
+          </div>
+          <div className={styles.item_container}>
+            <div className={styles.debug_response_container}>
+              {debugResult !== 0 && <JSONPretty id="json-pretty" data={debugParams} />}
             </div>
           </div>
         </Card>
@@ -1417,18 +1598,32 @@ class Interface extends Component {
     );
     return (
       <Content>
-        <Layout style={{ background: '#fff' ,borderRadius:'5px'}} onClick={()=>this.clearMenu()}>
-          <Sider style={{background:'#fff',height: '80vh',zIndex:2}}>
-            <Resizable className={styles.left_res_container} enable={{ right: true }} defaultSize={{height:'80vh'}} size={{height:'80vh'}}>
-              <Select placeholder="请选择项目" value={project||undefined} style={{ width: '100%' }} size='small' onChange={this.handleProjectChange}>
-                {projectList&&projectList.map((item)=>(
-                  <Option value={item.id} key={item.id}>{item.name}</Option>
-                ))}
-              </Select>
-              <div
-                className={styles.left_container}
-                ref={this.setDomTreeBoxRef}
+        <Layout
+          style={{ background: '#fff', borderRadius: '5px' }}
+          onClick={() => this.clearMenu()}
+        >
+          <Sider style={{ background: '#fff', height: '80vh', zIndex: 2 }}>
+            <Resizable
+              className={styles.left_res_container}
+              enable={{ right: true }}
+              defaultSize={{ height: '80vh' }}
+              size={{ height: '80vh' }}
+            >
+              <Select
+                placeholder="请选择项目"
+                value={project || undefined}
+                style={{ width: '100%' }}
+                size="small"
+                onChange={this.handleProjectChange}
               >
+                {projectList &&
+                  projectList.map(item => (
+                    <Option value={item.id} key={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+              </Select>
+              <div className={styles.left_container} ref={this.setDomTreeBoxRef}>
                 <Tree
                   showIcon
                   draggable
@@ -1441,24 +1636,32 @@ class Interface extends Component {
                   onDrop={this.onDrop}
                   onCheck={this.onCheck}
                   onExpand={this.onExpandTree}
-                  onRightClick={(e)=>this.handleOnRightClick(e)}
+                  onRightClick={e => this.handleOnRightClick(e)}
                 >
-                  {treeList&&loop(treeList)}
+                  {treeList && loop(treeList)}
                 </Tree>
               </div>
             </Resizable>
           </Sider>
-          <div style={{display:'flex',flexDirection:'row',width:'100%'}}>
-            <Content style={{background:'#fff',padding:10, height: '80vh',width:'70%',borderRight:'1px solid #e8e8e8'}}>
+          <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+            <Content
+              style={{
+                background: '#fff',
+                padding: 10,
+                height: '80vh',
+                width: '70%',
+                borderRight: '1px solid #e8e8e8',
+              }}
+            >
               <div className={styles.right_container}>
-                {!(selectedKeys&&selectedKeys.length>0)&&<Empty />}
-                {(selectedKeys&&selectNoteType===1)&&Folder}
-                {(selectedKeys&&selectNoteType===2)&& Case}
+                {!(selectedKeys && selectedKeys.length > 0) && <Empty />}
+                {selectedKeys && selectNoteType === 1 && Folder}
+                {selectedKeys && selectNoteType === 2 && Case}
               </div>
             </Content>
-            <Content style={{background:'#fff',padding:10, height: '80vh',width:'30%'}}>
+            <Content style={{ background: '#fff', padding: 10, height: '80vh', width: '30%' }}>
               <div className={styles.right_container}>
-                {(selectedKeys&&selectNoteType===2)&&Debug}
+                {selectedKeys && selectNoteType === 2 && Debug}
               </div>
             </Content>
           </div>
@@ -1469,4 +1672,4 @@ class Interface extends Component {
   }
 }
 
-export default Interface
+export default Interface;

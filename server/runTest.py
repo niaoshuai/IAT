@@ -391,6 +391,7 @@ if '__main__' == __name__:
       reulstPath = makeResultPath(now)
       tree = read_demo('templete.jmx')
       tree = set_data(tree,data=response["content"])
+      indent(tree.getroot())
       tree.write(reulstPath+'/test.jmx',encoding="utf-8")
       setTaskStatus(taskId, 2, "build task script")
       # runJmeterTest(reulstPath)

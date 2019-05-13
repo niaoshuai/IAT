@@ -866,6 +866,7 @@ def debugSample():
             ## 排除$.
             if(assertPathList.startswith('$.')):
               assertPathList = assertPathList[:2] ## 截取前两位
+            print(assertPathList)
             assertPathList = assertPathList.split('.')
             pathLen = len(assertPathList)
             need_data = res.json()

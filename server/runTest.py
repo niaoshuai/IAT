@@ -179,10 +179,10 @@ def JSONPathAssertion(data):
   JSONPathAssertion = ET.Element('JSONPathAssertion',{"guiclass":"JSONPathAssertionGui", "testclass":"JSONPathAssertion", "testname":u"JSON断言", "enabled":"true"})
   ET.SubElement(JSONPathAssertion, 'stringProp', {"name": "JSON_PATH"}).text = data['assertData'][0]['key']
   ET.SubElement(JSONPathAssertion, 'stringProp', {"name": "EXPECTED_VALUE"}).text = data['assertData'][0]['value']
-  ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "JSONVALIDATION"}).text = "false"
+  ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "JSONVALIDATION"}).text = "true"
   ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "EXPECT_NULL"}).text = "false"
   ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "INVERT"}).text = "false"
-  ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "ISREGEX"}).text = "true"
+  ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "ISREGEX"}).text = "false"
   return JSONPathAssertion
 
 def jSONPostProcessor(data):

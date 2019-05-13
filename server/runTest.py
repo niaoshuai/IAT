@@ -61,7 +61,7 @@ def configTestElement(test_domain,params=None,proxy=None):
       if item:
         paramElementProp = ET.Element('elementProp',{"name":item["key"], "elementType":"HTTPArgument"})
         ET.SubElement(paramElementProp,'boolProp',{"name":"HTTPArgument.always_encode"}).text = 'false'
-        ET.SubElement(paramElementProp,'stringProp',{"name":"Argument.value"}).text = item["value"]
+        ET.SubElement(paramElementProp,'stringProp',{"name":"Argument.value"}).text = ""+item["value"]+"]]"
         ET.SubElement(paramElementProp,'stringProp',{"name":"Argument.metadata"}).text = '='
         ET.SubElement(paramElementProp,'boolProp',{"name":"HTTPArgument.use_equals"}).text = 'true'
         ET.SubElement(paramElementProp,'stringProp',{"name":"Argument.name"}).text = item["key"]
@@ -121,7 +121,7 @@ def HTTPSamplerProxy(sample):
   HTTPSamplerProxy = ET.Element('HTTPSamplerProxy',{"guiclass":"HttpTestSampleGui", "testclass":"HTTPSamplerProxy", "testname":sample['name'], "enabled":"true"})
   elementProp = ET.SubElement(HTTPSamplerProxy,"elementProp",{"name": "HTTPsampler.Arguments", "elementType": "Arguments",
                                            "guiclass": "HTTPArgumentsPanel", "testclass": "Arguments",
-                                           "testname": "用户定义的变量", "enabled": "true"})
+                                           "testname": u"用户定义的变量", "enabled": "true"})
   collectionProp = ET.SubElement(elementProp, 'collectionProp', {"name": "Arguments.arguments"})
   if sample['params']:
     if sample['paramType'] ==2:
@@ -164,7 +164,7 @@ def HTTPSamplerProxy(sample):
   return HTTPSamplerProxy
 
 def ResponseAssertion(data):
-  ResponseAssertion = ET.Element('ResponseAssertion',{"guiclass":"AssertionGui", "testclass":"ResponseAssertion", "testname":"响应断言", "enabled":"true"})
+  ResponseAssertion = ET.Element('ResponseAssertion',{"guiclass":"AssertionGui", "testclass":"ResponseAssertion", "testname":u"响应断言", "enabled":"true"})
   collectionProp = ET.SubElement(ResponseAssertion, 'collectionProp', {"name": "Asserion.test_strings"})
   if data['assertData']:
     for item in data["assertData"]:
@@ -176,8 +176,8 @@ def ResponseAssertion(data):
   return ResponseAssertion
 
 def JSONPathAssertion(data):
-  JSONPathAssertion = ET.Element('JSONPathAssertion',{"guiclass":"JSONPathAssertionGui", "testclass":"JSONPathAssertion", "testname":"JSON断言", "enabled":"true"})
-  ET.SubElement(JSONPathAssertion, 'stringProp', {"name": "JSON_PATH"}).text = "$."+data['assertData'][0]['key']
+  JSONPathAssertion = ET.Element('JSONPathAssertion',{"guiclass":"JSONPathAssertionGui", "testclass":"JSONPathAssertion", "testname":u"JSON断言", "enabled":"true"})
+  ET.SubElement(JSONPathAssertion, 'stringProp', {"name": "JSON_PATH"}).text = data['assertData'][0]['key']
   ET.SubElement(JSONPathAssertion, 'stringProp', {"name": "EXPECTED_VALUE"}).text = data['assertData'][0]['value']
   ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "JSONVALIDATION"}).text = "false"
   ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "EXPECT_NULL"}).text = "false"
@@ -188,7 +188,7 @@ def JSONPathAssertion(data):
 def jSONPostProcessor(data):
   JSONPostProcessor = ET.Element('JSONPostProcessor',
                                  {"guiclass": "JSONPostProcessorGui", "testclass": "JSONPostProcessor",
-                                  "testname": "JSON提取器", "enabled": "true"})
+                                  "testname": u"JSON提取器", "enabled": "true"})
   ET.SubElement(JSONPostProcessor, 'stringProp', {"name": "JSONPostProcessor.referenceNames"}).text = data['extractData'][0]['key']
   ET.SubElement(JSONPostProcessor, 'stringProp', {"name": "JSONPostProcessor.jsonPathExprs"}).text = data['extractData'][0]['value']
   ET.SubElement(JSONPostProcessor, 'stringProp', {"name": "JSONPostProcessor.match_numbers"})
@@ -211,6 +211,22 @@ def beanShellPostProcessor(data):
   ET.SubElement(BeanShellPostProcessor, 'boolProp', {"name": "resetInterpreter"}).text = "false"
   ET.SubElement(BeanShellPostProcessor, 'stringProp', {"name": "script"}).text = data
   return BeanShellPostProcessor
+
+
+def indent(elem, level=0):
+    i = "\n" + level*"\t"
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "\t"
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
 
 def set_data(tree,data):
   root = tree.getroot()
@@ -375,7 +391,7 @@ if '__main__' == __name__:
       reulstPath = makeResultPath(now)
       tree = read_demo('templete.jmx')
       tree = set_data(tree,data=response["content"])
-      tree.write(reulstPath+'/test.jmx')
+      tree.write(reulstPath+'/test.jmx',encoding="utf-8")
       setTaskStatus(taskId, 2, "build task script")
       # runJmeterTest(reulstPath)
       runJmeterTestDocker(reulstPath,taskId)

@@ -859,9 +859,13 @@ def debugSample():
             if delSpace and delSpace in res.text:
               debugResult = 1
         if rowData.asserts_type == 2:
+          ## JSON 断言
           for item in asserts_data:
             debugResult = 2
-            assertPathList = item["key"]
+            assertPathList = item["key"] ## 校验key
+            ## 排除$.
+            if(assertPathList.startswith('$.')):
+              assertPathList = assertPathList[:2] ## 截取前两位
             assertPathList = assertPathList.split('.')
             pathLen = len(assertPathList)
             need_data = res.json()
@@ -870,6 +874,7 @@ def debugSample():
               if key == '0':
                 key = 0
               need_data = need_data[key]
+
             if str(need_data) == item["value"]:
               debugResult = 1
       content = {

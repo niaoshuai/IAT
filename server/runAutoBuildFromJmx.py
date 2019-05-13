@@ -113,8 +113,6 @@ def runbuild(userId,projectId,fileName):
                 jsonPath1=jsonPath.text
               if jsonPath.attrib['name'] == 'EXPECTED_VALUE':
                 expectValue=jsonPath.text
-                if(expectValue.startswith("$.")):
-                  expectValue=expectValue[2:]
 
             assertData.append({
               "id":int(round(time.time() * 1000)),

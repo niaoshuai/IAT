@@ -817,6 +817,8 @@ def debugSample():
   domain = request.json.get("domain")
   headers = request.json.get("headers")
   rowData = Sample.query.filter_by(pid=id).first()
+
+  print(rowData)
   if not domain:
     return make_response(jsonify({'code': 10001, 'content': None, 'msg': u'调试域名必填!'}))
   if rowData:
@@ -847,7 +849,12 @@ def debugSample():
       elif rowData.method == 'GET':
         res = requests.get(url, headers=headers, params=req_params, verify=False)
       else:
-        return make_response(jsonify({'code': 10001, 'content': None, 'msg': 'server error!'}))
+        return make_response(jsonify({'code': 10001, 'content': None, 'msg': '不支持你的请求类型!'}))
+      # 验证错误代码
+      if res.status_code != 200:
+        print(res.text)
+        return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
+     
       response = res.json()
       debugResult = 3
       asserts_data = json.loads(rowData.asserts_data)
@@ -860,14 +867,12 @@ def debugSample():
               debugResult = 1
         if rowData.asserts_type == 2:
           ## JSON 断言
-          print(res.text)
           for item in asserts_data:
             debugResult = 2
             assertPathList = item["key"] ## 校验key
             ## 排除$.
             if(assertPathList.startswith('$.')):
               assertPathList = assertPathList[2:] ## 截取前两位
-            print(assertPathList)
             assertPathList = assertPathList.split('.')
             pathLen = len(assertPathList)
             need_data = res.json()
@@ -879,9 +884,36 @@ def debugSample():
 
             if str(need_data) == item["value"]:
               debugResult = 1
+      # 定义参数化值获取
+      debugParams=[]
+      extract_data = json.loads(rowData.extract_data)
+      if len(asserts_data) > 0:
+        for item in extract_data:
+
+          extractPathList = item["value"] ## 校验value
+          ## 排除$.
+          if(extractPathList.startswith('$.')):
+            extractPathList = extractPathList[2:] ## 截取前两位
+          extractPathList = extractPathList.split('.')
+          pathLen = len(extractPathList)
+          need_data = res.json()
+          for i in range(0, pathLen):
+              key = extractPathList[i]
+              if key == 'data[*]':
+                key = "data[0]"
+                tmpLen = len(need_data["data"])
+                need_data = need_data["data"][0]
+                continue
+              elif key == '0':
+                key = 0             
+              need_data = need_data[key]
+          # need_data=need_data[key]
+          debugParams.append({"extract_name":item["key"],"extract_value":need_data})
+
       content = {
         "debugData": response,
         "debugResult": debugResult,
+        "debugParams":debugParams,
       }
       return make_response(jsonify({'code': 0, 'content': content, 'msg': ''}))
 

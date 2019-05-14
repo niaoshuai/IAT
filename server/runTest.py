@@ -130,7 +130,7 @@ def HTTPSamplerProxy(sample):
         if item:
           formParams[item["key"]] = item["value"]
       paramElementProp = ET.Element('elementProp', {"name": "", "elementType": "HTTPArgument"})
-      ET.SubElement(paramElementProp, 'boolProp', {"name": "HTTPArgument.always_encode"}).text = 'false'
+      ET.SubElement(paramElementProp, 'boolProp', {"name": "HTTPArgument.always_encode"}).text = 'true'
       ET.SubElement(paramElementProp, 'stringProp', {"name": "Argument.value"}).text = json.dumps(formParams)
       ET.SubElement(paramElementProp, 'stringProp', {"name": "Argument.metadata"}).text = '='
       collectionProp.append(paramElementProp)
@@ -138,7 +138,7 @@ def HTTPSamplerProxy(sample):
       for item in sample['params']:
         if item:
           paramElementProp = ET.Element('elementProp', {"name": item["key"], "elementType": "HTTPArgument"})
-          ET.SubElement(paramElementProp, 'boolProp', {"name": "HTTPArgument.always_encode"}).text = 'false'
+          ET.SubElement(paramElementProp, 'boolProp', {"name": "HTTPArgument.always_encode"}).text = 'true'
           ET.SubElement(paramElementProp, 'stringProp', {"name": "Argument.value"}).text = item["value"]
           ET.SubElement(paramElementProp, 'stringProp', {"name": "Argument.metadata"}).text = '='
           ET.SubElement(paramElementProp, 'boolProp', {"name": "HTTPArgument.use_equals"}).text = 'true'

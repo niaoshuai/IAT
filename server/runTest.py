@@ -61,7 +61,7 @@ def configTestElement(test_domain,params=None,proxy=None):
       if item:
         paramElementProp = ET.Element('elementProp',{"name":item["key"], "elementType":"HTTPArgument"})
         ET.SubElement(paramElementProp,'boolProp',{"name":"HTTPArgument.always_encode"}).text = 'false'
-        ET.SubElement(paramElementProp,'stringProp',{"name":"Argument.value"}).text = ""+item["value"]+"]]"
+        ET.SubElement(paramElementProp,'stringProp',{"name":"Argument.value"}).text = ""+item["value"]
         ET.SubElement(paramElementProp,'stringProp',{"name":"Argument.metadata"}).text = '='
         ET.SubElement(paramElementProp,'boolProp',{"name":"HTTPArgument.use_equals"}).text = 'true'
         ET.SubElement(paramElementProp,'stringProp',{"name":"Argument.name"}).text = item["key"]

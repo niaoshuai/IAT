@@ -1420,7 +1420,7 @@ class Interface extends Component {
                   className={styles.item_item}
                   style={{ height: 60 }}
                 >
-                  <Icon type="plus" /> Add field
+                  <Icon type="plus" /> Add fieldgit
                 </Button>
               </div>
             )}

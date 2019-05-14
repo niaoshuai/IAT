@@ -1,14 +1,26 @@
 /* eslint-disable no-param-reassign */
 import React, { PureComponent } from 'react';
 import {
-  Form, Tree ,Select,Icon,Transfer,message,Input,Card,Divider,TimePicker ,Button,Radio,Spin
+  Form,
+  Tree,
+  Select,
+  Icon,
+  Transfer,
+  message,
+  Input,
+  Card,
+  Divider,
+  TimePicker,
+  Button,
+  Radio,
+  Spin,
 } from 'antd';
 import moment from 'moment';
-import {connect} from 'dva';
+import { connect } from 'dva';
 
-import PageHeaderWrapper from '@/components/PageHeaderWrapper'
-import KeyValueInput from '@/components/KeyValueInput'
-import styles from './index.less'
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import KeyValueInput from '@/components/KeyValueInput';
+import styles from './index.less';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -18,7 +30,7 @@ const RadioGroup = Radio.Group;
 let headerId = 0;
 let paramId = 0;
 
-@connect(({ system,task }) => ({
+@connect(({ system, task }) => ({
   system,
   task,
 }))
@@ -26,53 +38,52 @@ let paramId = 0;
   onValuesChange(props, changedValues, allValues) {
     // 表单项变化时请求数据
     // eslint-disable-next-line
-    if(changedValues){
-      for (var changeKey in changedValues){
-        if (changeKey === 'project'){
-          const projectId = allValues.project
-          console.log('projectId:',projectId)
-          const {dispatch} = props;
+    if (changedValues) {
+      for (var changeKey in changedValues) {
+        if (changeKey === 'project') {
+          const projectId = allValues.project;
+          console.log('projectId:', projectId);
+          const { dispatch } = props;
           dispatch({
-            type:'task/queryProjectCaseList',
-            payload:{
-              id:projectId,
-            }
-          })
+            type: 'task/queryProjectCaseList',
+            payload: {
+              id: projectId,
+            },
+          });
         }
       }
     }
   },
 })
 class AddImm extends PureComponent {
-  state={
-    projectList:[],
-  }
-
-  componentWillMount(){
-    this.queryProjectList()
-  }
-
-  queryProjectList=()=>{
-    const {dispatch} = this.props
-    dispatch({
-      type:'system/queryProjectList',
-      payload:{
-        status:'1',
-      }
-    })
-      .then(()=>{
-        const {system} = this.props
-        this.setState({
-          projectList:system.projectList,
-        })
-      })
+  state = {
+    projectList: [],
   };
 
-  handleBack=()=>{
+  componentWillMount() {
+    this.queryProjectList();
+  }
+
+  queryProjectList = () => {
     const { dispatch } = this.props;
     dispatch({
-      type:'task/goListPage',
-    })
+      type: 'system/queryProjectList',
+      payload: {
+        status: '1',
+      },
+    }).then(() => {
+      const { system } = this.props;
+      this.setState({
+        projectList: system.projectList,
+      });
+    });
+  };
+
+  handleBack = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'task/goListPage',
+    });
   };
 
   handleSubmit = e => {
@@ -80,14 +91,14 @@ class AddImm extends PureComponent {
     e.preventDefault();
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        const formatTime = moment(values.runTime).format('HH:mm')
-        values.runTime = formatTime
+        const formatTime = moment(values.runTime).format('HH:mm');
+        values.runTime = formatTime;
         dispatch({
-          type:'task/queryAddTask',
-          payload:{
-            info:values,
-          }
-        })
+          type: 'task/queryAddTask',
+          payload: {
+            info: values,
+          },
+        });
       }
     });
   };
@@ -101,7 +112,7 @@ class AddImm extends PureComponent {
     form.setFieldsValue({
       headerkeys: nextKeys,
     });
-  }
+  };
 
   addParam = () => {
     const { form } = this.props;
@@ -112,9 +123,9 @@ class AddImm extends PureComponent {
     form.setFieldsValue({
       paramkeys: nextKeys,
     });
-  }
+  };
 
-  removeHeader = (k) => {
+  removeHeader = k => {
     const { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue('headerkeys');
@@ -122,9 +133,9 @@ class AddImm extends PureComponent {
     form.setFieldsValue({
       headerkeys: keys.filter(key => key !== k),
     });
-  }
+  };
 
-  removeParam = (k) => {
+  removeParam = k => {
     const { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue('paramkeys');
@@ -132,23 +143,25 @@ class AddImm extends PureComponent {
     form.setFieldsValue({
       paramkeys: keys.filter(key => key !== k),
     });
-  }
+  };
 
   render() {
     const {
       form: { getFieldDecorator, getFieldValue },
       task,
     } = this.props;
-    const {projectList} = this.state;
+    const { projectList } = this.state;
     const formItemLayout = {
       labelCol: {
-        xs: { span: 24 },
-        sm: { span: 7 },
+        xs: { span: 4 },
+        sm: { span: 4 },
+        xl: { span: 4 },
       },
       wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 12 },
+        xs: { span: 8 },
+        sm: { span: 8 },
         md: { span: 10 },
+        xl: { span: 16 },
       },
     };
     const submitFormLayout = {
@@ -168,9 +181,7 @@ class AddImm extends PureComponent {
       >
         {getFieldDecorator(`headers[${k}]`, {
           validateTrigger: ['onChange', 'onBlur'],
-        })(
-          <KeyValueInput />
-        )}
+        })(<KeyValueInput />)}
         {headerkeys.length > 0 ? (
           <Icon
             className={styles.dynamic_delete_button}
@@ -191,9 +202,7 @@ class AddImm extends PureComponent {
       >
         {getFieldDecorator(`params[${k}]`, {
           validateTrigger: ['onChange', 'onBlur'],
-        })(
-          <KeyValueInput />
-        )}
+        })(<KeyValueInput />)}
         {paramkeys.length > 0 ? (
           <Icon
             className={styles.dynamic_delete_button}
@@ -212,16 +221,19 @@ class AddImm extends PureComponent {
                 rules: [
                   {
                     required: true,
-                    message: "项目名称不可为空",
+                    message: '项目名称不可为空',
                   },
                 ],
               })(
                 <Select placeholder="请先选择项目" style={{ width: 220 }}>
-                  {projectList&&projectList.map((item)=>{
-                    return(
-                      <Option value={item.id} key={item.id} title={item.name}>{item.name}</Option>
-                    )
-                  })}
+                  {projectList &&
+                    projectList.map(item => {
+                      return (
+                        <Option value={item.id} key={item.id} title={item.name}>
+                          {item.name}
+                        </Option>
+                      );
+                    })}
                 </Select>
               )}
             </FormItem>
@@ -230,7 +242,7 @@ class AddImm extends PureComponent {
                 rules: [
                   {
                     required: true,
-                    message: "任务名称不可为空",
+                    message: '任务名称不可为空',
                   },
                 ],
               })(<Input placeholder="请输入任务名称" />)}
@@ -242,13 +254,7 @@ class AddImm extends PureComponent {
                     required: false,
                   },
                 ],
-              })(
-                <TextArea
-                  style={{ minHeight: 32 }}
-                  placeholder="请输入任务描述"
-                  rows={4}
-                />
-              )}
+              })(<TextArea style={{ minHeight: 32 }} placeholder="请输入任务描述" rows={4} />)}
             </FormItem>
             <FormItem {...formItemLayout} label="任务类型">
               <div>
@@ -256,7 +262,7 @@ class AddImm extends PureComponent {
                   rules: [
                     {
                       required: true,
-                      message: "任务类型不可为空",
+                      message: '任务类型不可为空',
                     },
                   ],
                   initialValue: '2',
@@ -267,11 +273,11 @@ class AddImm extends PureComponent {
                   </Radio.Group>
                 )}
                 <FormItem style={{ marginBottom: 0 }}>
-                  {getFieldDecorator('runTime',{
-                    initialValue:moment('12:08', 'HH:mm'),
+                  {getFieldDecorator('runTime', {
+                    initialValue: moment('12:08', 'HH:mm'),
                   })(
                     <TimePicker
-                      format='HH:mm'
+                      format="HH:mm"
                       style={{
                         margin: '8px 0',
                         display: getFieldValue('taskType') === '2' ? 'block' : 'none',
@@ -286,20 +292,17 @@ class AddImm extends PureComponent {
                 rules: [
                   {
                     required: true,
-                    message: "测试域名不可为空",
+                    message: '测试域名不可为空',
                   },
                 ],
               })(<Input placeholder="请输入测试域名 .eg: https://app.xxx.com:8080" />)}
             </FormItem>
             <FormItem {...formItemLayout} label="代理设置">
-              {getFieldDecorator('proxy', {
-              })(
+              {getFieldDecorator('proxy', {})(
                 <Input placeholder="格式: user:password@server:port" />
               )}
             </FormItem>
-            <Form.Item
-              className={styles.listForm}
-            >
+            <Form.Item className={styles.listForm}>
               {headerItems}
               <Form.Item {...submitFormLayout}>
                 <Button type="dashed" onClick={this.addHeader} style={{ width: '100%' }}>
@@ -307,9 +310,7 @@ class AddImm extends PureComponent {
                 </Button>
               </Form.Item>
             </Form.Item>
-            <Form.Item
-              className={styles.listForm}
-            >
+            <Form.Item className={styles.listForm}>
               {paramItems}
               <Form.Item {...submitFormLayout}>
                 <Button type="dashed" onClick={this.addParam} style={{ width: '100%' }}>
@@ -318,26 +319,28 @@ class AddImm extends PureComponent {
               </Form.Item>
             </Form.Item>
             <FormItem {...formItemLayout} label="用例设置">
-              {getFieldDecorator('case',{
+              {getFieldDecorator('case', {
                 rules: [
                   {
                     required: true,
-                    message: "任务用例不可为空",
+                    message: '任务用例不可为空',
                   },
                 ],
               })(
                 <Transfer
                   dataSource={task.caseData}
                   titles={['项目用例', '任务用例']}
-                  targetKeys={getFieldValue("case")}
+                  targetKeys={getFieldValue('case')}
                   render={item => item.name}
+                  listStyle={{
+                    width: 430,
+                    height: 400,
+                  }}
                 />
               )}
             </FormItem>
             <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
-              <Button onClick={()=>this.handleBack()}>
-                取消
-              </Button>
+              <Button onClick={() => this.handleBack()}>取消</Button>
               <Button type="primary" htmlType="submit" style={{ marginLeft: 8 }}>
                 提交
               </Button>
@@ -348,4 +351,4 @@ class AddImm extends PureComponent {
     );
   }
 }
-export default AddImm
+export default AddImm;

@@ -798,6 +798,50 @@ class Interface extends Component {
     }
   };
 
+  handeExtractData = () => {
+    const emptyItem = {
+      id: new Date().getTime(),
+      key: '',
+      value: '',
+    };
+    if (this.state.infoExtractData) {
+      const newAttr = this.state.infoExtractData.concat(emptyItem);
+      this.setState(
+        {
+          infoExtractData: newAttr,
+        },
+        () => this.handleExtractDataChange()
+      );
+    } else {
+      this.setState(
+        {
+          infoExtractData: [emptyItem],
+        },
+        () => this.handleExtractDataChange()
+      );
+    }
+  };
+
+  handleDeleteExtractSection = index => {
+    const oldAttr = this.state.infoExtractData;
+    if (index === 0 && oldAttr.length === 1) {
+      this.setState(
+        {
+          infoExtractData: [],
+        },
+        () => this.handleExtractDataChange()
+      );
+    } else {
+      oldAttr.splice(index, 1);
+      this.setState(
+        {
+          infoExtractData: oldAttr,
+        },
+        () => this.handleExtractDataChange()
+      );
+    }
+  };
+
   handleAddHeader = () => {
     const emptyItem = {
       id: new Date().getTime(),
@@ -910,7 +954,8 @@ class Interface extends Component {
 
   handleHeaderValueChange = (e, index) => {
     const { debugHeader } = this.state;
-    debugHeader[index].value = e.target.value;
+    debugHeader[index].v;
+    alue = e.target.value;
     this.setState({ debugHeader });
   };
 
@@ -1420,7 +1465,7 @@ class Interface extends Component {
                   className={styles.item_item}
                   style={{ height: 60 }}
                 >
-                  <Icon type="plus" /> Add fieldgit
+                  <Icon type="plus" /> Add field
                 </Button>
               </div>
             )}
@@ -1445,8 +1490,19 @@ class Interface extends Component {
                           onBlur={() => this.handleAssertDataChange()}
                         />
                       </Col>
+                      <div className={styles.section_delete}>
+                        <Icon type="minus-circle" onClick={() => this.handleDeleteSection(index)} />
+                      </div>
                     </InputGroup>
                   ))}
+                <Button
+                  type="dashed"
+                  onClick={() => this.handeAssertData()}
+                  className={styles.item_item}
+                  style={{ height: 60 }}
+                >
+                  <Icon type="plus" /> Add field
+                </Button>
               </div>
             )}
           </div>
@@ -1490,8 +1546,20 @@ class Interface extends Component {
                           onBlur={() => this.handleExtractDataChange()}
                         />
                       </Col>
+                      <Icon
+                        type="minus-circle"
+                        onClick={() => this.handleDeleteExtractSection(index)}
+                      />
                     </InputGroup>
                   ))}
+                <Button
+                  type="dashed"
+                  onClick={() => this.handeExtractData()}
+                  className={styles.item_item}
+                  style={{ height: 60 }}
+                >
+                  <Icon type="plus" /> Add field
+                </Button>
               </div>
             )}
           </div>

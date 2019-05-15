@@ -818,12 +818,24 @@ def debugSample():
   headers = request.json.get("headers")
   rowData = Sample.query.filter_by(pid=id).first()
 
-  print(rowData)
   if not domain:
     return make_response(jsonify({'code': 10001, 'content': None, 'msg': u'调试域名必填!'}))
   if rowData:
     req_params = {}
-    url = domain + rowData.path
+    ## 处理rowData.path
+    basePath = rowData.path
+    ## 获取前置shell 注入数据 [字符串]
+    preShellData = rowData.preShellData
+    if preShellData:
+      preShellDataArr = preShellData.split("\n")
+      for i in range(len(preShellDataArr)):
+        line = preShellDataArr[i].strip().replace('\n', '')  
+        if line.find('=') > 0:  
+                lineArr = line.split('=')  
+                lineArr[1]= line[len(lineArr[0])+1:] 
+        basePath = basePath.replace("${"+lineArr[0]+"}",lineArr[1])
+   
+    url = domain + basePath
     if rowData.params:
       paramsStr = json.loads(rowData.params)
       if paramsStr:

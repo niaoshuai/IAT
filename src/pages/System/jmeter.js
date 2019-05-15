@@ -119,7 +119,13 @@ class Jmeter extends PureComponent {
               新增项目
             </Button>
           </div>
-          <Table loading={loading} dataSource={jmeterList} columns={columns} size="small" />
+          <Table
+            rowKey={record => record.id}
+            loading={loading}
+            dataSource={jmeterList}
+            columns={columns}
+            size="small"
+          />
         </Card>
         <Modal
           visible={showAddModal}

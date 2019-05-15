@@ -8,9 +8,9 @@ auth = Blueprint('auth', __name__)
 
 def encrypt_password(password, salt=None, encryptlop=30):
     if not salt:
-        salt = os.urandom(16).encode('hex')  # length 32
+        salt = os.urandom(16).hex()  # length 32
     for i in range(encryptlop):
-        password = hashlib.sha256(password + salt).hexdigest()  # length 64
+        password = hashlib.sha256((password + salt).encode("utf8")).hexdigest()  # length 64
     return password, salt
 
 @auth.route('/login',methods=['POST'])

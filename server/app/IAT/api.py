@@ -2,7 +2,7 @@
 from flask import Blueprint, jsonify, make_response, session, request
 from app.tables.IAT import Project, Tree, Sample, Task, TaskCount
 from app.tables.User import users
-import os,hashlib,subprocess, json, requests, time,datetime
+import os,hashlib,subprocess, json, requests, time,datetime,random
 from sqlalchemy import extract
 from app import db, app
 
@@ -831,15 +831,16 @@ def debugSample():
     ## 处理rowData.path
     basePath = rowData.path
     ## 获取前置shell 注入数据 [字符串]
-    preShellData = rowData.preShellData
-    if preShellData:
-      preShellDataArr = preShellData.split("\n")
-      for i in range(len(preShellDataArr)):
-        line = preShellDataArr[i].strip().replace('\n', '')  
-        if line.find('=') > 0:  
-                lineArr = line.split('=')  
-                lineArr[1]= line[len(lineArr[0])+1:] 
-        basePath = basePath.replace("${"+lineArr[0]+"}",lineArr[1])
+    if rowData.pre_shell_data:
+      preShellData = rowData.pre_shell_data
+      if preShellData:
+        preShellDataArr = preShellData.split("\n")
+        for i in range(len(preShellDataArr)):
+          line = preShellDataArr[i].strip().replace('\n', '')  
+          if line.find('=') > 0:  
+                  lineArr = line.split('=')  
+                  lineArr[1]= line[len(lineArr[0])+1:] 
+          basePath = basePath.replace("${"+lineArr[0]+"}",lineArr[1])
    
     url = domain + basePath
     if rowData.params:
@@ -847,11 +848,26 @@ def debugSample():
       if paramsStr:
         formParams = {}
         for item in paramsStr:
+          paramsValueStr= item["value"]
           ## 处理参数化值
-          paramsValueStr= item["value"];
-          if debugParams1Json:
-            if item["key"] in debugParams1Json :
-              paramsValueStr=debugParams1Json[item["key"]]
+          if item['type']:
+             tmpVar = "${"+item['key']+"}"
+             if paramsValueStr.find(tmpVar) >= 0:
+               if 'debugParams1Json' in locals():
+                paramsValueStr=paramsValueStr.replace(tmpVar,debugParams1Json[0][item['key']])
+          else:
+           
+            if 'debugParams1Json' in locals():
+              # if item["key"] in debugParams1Json :
+                # paramsValueStr=debugParams1Json[item["key"]]
+                if len(debugParams1Json) > 0:
+                  for debugParams1JsonKey in debugParams1Json[0].keys():
+                    tmpVar = "${"+debugParams1JsonKey+"}"
+                    tmpVarVal = debugParams1Json[0][debugParams1JsonKey]
+                    if paramsValueStr.find(tmpVar) >= 0:
+                      paramsValueStr=paramsValueStr.replace(tmpVar,tmpVarVal)
+                    # if paramsValueStr.find(tmpVar) >= 0:
+                    #   paramsValueStr=paramsValueStr.replace(tmpVar,tmpVarVal)
           req_params[item["key"]] = paramsValueStr
           formParams[item["key"]] = (None,paramsValueStr)
     try:
@@ -879,6 +895,12 @@ def debugSample():
         return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
      
       response = res.json()
+
+       # 验证错误代码
+      # if response.:
+      #   print(res.text)
+      #   return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
+     
       debugResult = 3
       asserts_data = json.loads(rowData.asserts_data)
       if len(asserts_data) > 0:
@@ -907,31 +929,39 @@ def debugSample():
 
             if str(need_data) == item["value"]:
               debugResult = 1
+      
+      # 断言通过
       # 定义参数化值获取
       debugParams=[]
-      extract_data = json.loads(rowData.extract_data)
-      if len(asserts_data) > 0:
-        for item in extract_data:
+      if debugResult == 1:
+        extract_data = json.loads(rowData.extract_data)
+        if len(asserts_data) > 0:
+          for item in extract_data:
 
-          extractPathList = item["value"] ## 校验value
-          ## 排除$.
-          if(extractPathList.startswith('$.')):
-            extractPathList = extractPathList[2:] ## 截取前两位
-          extractPathList = extractPathList.split('.')
-          pathLen = len(extractPathList)
-          need_data = res.json()
-          for i in range(0, pathLen):
-              key = extractPathList[i]
-              if key == 'data[*]':
-                key = "data[0]"
-                tmpLen = len(need_data["data"])
-                need_data = need_data["data"][0]
-                continue
-              elif key == '0':
-                key = 0             
-              need_data = need_data[key]
-          # need_data=need_data[key]
-          debugParams.append({"extract_name":item["key"],"extract_value":need_data})
+            extractPathList = item["value"] ## 校验value
+            ## 排除$.
+            if(extractPathList.startswith('$.')):
+              extractPathList = extractPathList[2:] ## 截取前两位
+            extractPathList = extractPathList.split('.')
+            pathLen = len(extractPathList)
+            need_data = res.json()
+            for i in range(0, pathLen):
+                key = extractPathList[i]
+                if key == 'data[*]':
+                  key = "data[0]"
+                  tmpLen = len(need_data["data"])
+                  if tmpLen > 0 :
+                    tmpIndexRan = random.randint(0,tmpLen-1)
+                    need_data = need_data["data"][tmpIndexRan]
+                  continue
+                elif key == '0':
+                  key = 0
+                if key not in need_data:
+                  need_data = {}
+                  break
+                need_data = need_data[key]
+            # need_data=need_data[key]
+            debugParams.append({item["key"]:need_data})
 
       content = {
         "debugData": response,
@@ -939,8 +969,18 @@ def debugSample():
         "debugParams":debugParams,
       }
       # 缓存结果
-      response.set_cookie('debugParams',json.dumps(debugParams))
-      return make_response(jsonify({'code': 0, 'content': content, 'msg': ''}))
+      response = make_response(jsonify({'code': 0, 'content': content, 'msg': ''}))
+
+      if len(debugParams) > 0:
+        ## 多次test集合
+        if 'debugParams1Json' in locals():
+          # debugParams1Json[0][debugParams[0]]
+          # for dk in debugParams[0].keys():
+          #   debugParams1Json[0][dK]=debugParams[0][dk]
+          for debugParamsItem in debugParams:
+            debugParams1Json[0].update(debugParamsItem)
+          response.set_cookie('debugParams',json.dumps(debugParams1Json))
+      return response
 
     except Exception as e:
       print(e)

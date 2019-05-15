@@ -818,6 +818,12 @@ def debugSample():
   headers = request.json.get("headers")
   rowData = Sample.query.filter_by(pid=id).first()
 
+  debugParams1=request.cookies.get('debugParams')
+  if debugParams1:
+    # 处理缓存参数
+    debugParams1Json=json.loads(debugParams1)
+
+
   if not domain:
     return make_response(jsonify({'code': 10001, 'content': None, 'msg': u'调试域名必填!'}))
   if rowData:
@@ -841,8 +847,13 @@ def debugSample():
       if paramsStr:
         formParams = {}
         for item in paramsStr:
-          req_params[item["key"]] = item["value"]
-          formParams[item["key"]] = (None,item["value"])
+          ## 处理参数化值
+          paramsValueStr= item["value"];
+          if debugParams1Json:
+            if item["key"] in debugParams1Json :
+              paramsValueStr=debugParams1Json[item["key"]]
+          req_params[item["key"]] = paramsValueStr
+          formParams[item["key"]] = (None,paramsValueStr)
     try:
       if rowData.method == 'POST':
         if rowData.param_type == 3:
@@ -927,6 +938,8 @@ def debugSample():
         "debugResult": debugResult,
         "debugParams":debugParams,
       }
+      # 缓存结果
+      response.set_cookie('debugParams',json.dumps(debugParams))
       return make_response(jsonify({'code': 0, 'content': content, 'msg': ''}))
 
     except Exception as e:

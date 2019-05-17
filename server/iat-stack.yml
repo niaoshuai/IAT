@@ -2,10 +2,10 @@ version: '3.2'
 
 services:
   iat-server:
-    image: registry.cn-beijing.aliyuncs.com/niao/iat-server:1.0.0
+    image: registry-vpc.cn-beijing.aliyuncs.com/niao/iat-server:1.0.0
     container_name: iat-server
     ports:
-    - "5000:5000"
+    - "5000"
     links:
     - iat-mysql
     volumes:
@@ -22,7 +22,7 @@ services:
     image: mysql:5.6
     container_name: iat-mysql
     ports:
-    - "3306:3306"
+    - "3306"
     volumes:
     - iat_mysql_data:/var/lib/mysql 
     environment:
@@ -35,7 +35,7 @@ services:
         constraints: [node.role == manager]
     
   iat-h5:
-    image: registry.cn-beijing.aliyuncs.com/niao/iat-h5:1.0.0
+    image: registry-vpc.cn-beijing.aliyuncs.com/niao/iat-h5:1.0.0
     container_name: iat-h5
     ports:
     - "8000:80"
@@ -48,7 +48,7 @@ services:
         constraints: [node.role == manager]
     
 networks:
-  agent_network:
+  iat_network:
     driver: overlay
     attachable: true
     

@@ -10,7 +10,7 @@ WORKDIR /usr/local/src/iat-h5/
 
 # 安装NODE 环境
 # RUN apk add --no-cache nodejs
-RUN apk add nodejs
+RUN apk add nodejs,npm
 
 # 复制文件
 COPY ./ ./

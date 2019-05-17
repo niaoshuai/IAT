@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM nginx:stable-alpine
 
 LABEL maintainer="niaoshuai <niao.shuai123@163.com>"
 
@@ -14,7 +14,7 @@ WORKDIR /usr/local/src/iat-h5/
 #     && apk add npm 
 
 # 复制文件
-COPY ./dist/ ./
+COPY ./dist/ /usr/share/nginx/html
 
 # 安装依赖
 # RUN npm install --silent --no-cache  --registry=https://registry.npm.taobao.org
@@ -24,15 +24,15 @@ COPY ./dist/ ./
 # RUN npm run build
 
 # 安装nginx
-RUN apk add nginx
+# RUN apk add nginx
 
 # 配置nginx
-RUN mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
-COPY docker/nginx.conf  /etc/nginx/
+# RUN mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
+# COPY docker/nginx.conf  /etc/nginx/
 
 # 开放80端口
-EXPOSE 80
+# EXPOSE 80
 
 # 启动nginx命令
 # CMD ["rc-service", "nginx", "start"]
-CMD ["/usr/local/nginx/sbin/nginx"]
+# CMD ["/usr/local/nginx/sbin/nginx"]

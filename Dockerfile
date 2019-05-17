@@ -28,7 +28,7 @@ RUN apk add nginx
 
 # 配置nginx
 RUN mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
-RUN cp docker/nginx.conf /etc/nginx/
+COPY docker/nginx.conf  /etc/nginx/
 
 # 开放80端口
 EXPOSE 80

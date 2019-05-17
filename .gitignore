@@ -32,9 +32,9 @@ functions/mock
 .umi
 .umi-production
 
-# dist
-dist/
-dist/**
+# # dist
+# dist/
+# dist/**
 
 # screenshot
 screenshot

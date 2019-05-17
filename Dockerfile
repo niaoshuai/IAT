@@ -10,18 +10,18 @@ WORKDIR /usr/local/src/iat-h5/
 
 # 安装NODE 环境
 # RUN apk add --no-cache nodejs
-RUN apk add nodejs \
-    && apk add npm 
+# RUN apk add nodejs \
+#     && apk add npm 
 
 # 复制文件
-COPY ./ ./
+COPY ./dist/ ./
 
 # 安装依赖
 # RUN npm install --silent --no-cache  --registry=https://registry.npm.taobao.org
-RUN npm install --registry=https://registry.npm.taobao.org
+# RUN npm install --registry=https://registry.npm.taobao.org
 
 # 构建
-RUN npm run build
+# RUN npm run build
 
 # 安装nginx
 RUN apk add nginx
@@ -34,4 +34,5 @@ RUN cp docker/nginx.conf /etc/nginx/
 EXPOSE 80
 
 # 启动nginx命令
-CMD ["rc-service", "nginx", "start"]
+# CMD ["rc-service", "nginx", "start"]
+CMD ["/usr/local/nginx/sbin/nginx"]

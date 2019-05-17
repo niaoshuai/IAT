@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   iat-server:
-    image: registry-vpc.cn-beijing.aliyuncs.com/niao/iat-server:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/niao/iat-server:1.0.0
     container_name: iat-server
     ports:
     - "5000"
@@ -35,7 +35,7 @@ services:
         constraints: [node.role == manager]
     
   iat-h5:
-    image: registry-vpc.cn-beijing.aliyuncs.com/niao/iat-h5:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/niao/iat-h5:1.0.0
     container_name: iat-h5
     ports:
     - "8000:80"

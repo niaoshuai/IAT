@@ -18,3 +18,10 @@ services:
     environment:
     - MYSQL_DATABASE=IAT
     - MYSQL_ROOT_PASSWORD=root
+  iat-h5:
+    image: registry.cn-beijing.aliyuncs.com/niao/iat-h5:1.0.0
+    container_name: iat-h5
+    ports:
+    - "8000:8000"
+    links:
+    - iat-server

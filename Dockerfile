@@ -22,4 +22,4 @@ RUN apt clean all
 
 RUN npm run test:all
 
-CMD ["npm","run", "start:no-mock"]
+CMD ["npm", "start:no-mock"]

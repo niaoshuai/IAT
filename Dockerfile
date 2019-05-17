@@ -17,7 +17,8 @@ RUN apk add nodejs \
 COPY ./ ./
 
 # 安装依赖
-RUN npm install --silent --no-cache  --registry=https://registry.npm.taobao.org
+# RUN npm install --silent --no-cache  --registry=https://registry.npm.taobao.org
+RUN npm install --registry=https://registry.npm.taobao.org
 
 # 构建
 RUN npm run build

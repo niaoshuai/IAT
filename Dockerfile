@@ -10,13 +10,14 @@ WORKDIR /usr/local/src/iat-h5/
 
 # 安装NODE 环境
 # RUN apk add --no-cache nodejs
-RUN apk add nodejs,npm
+RUN apk add nodejs \
+    && apk add npm 
 
 # 复制文件
 COPY ./ ./
 
 # 安装依赖
-RUN npm install --silent --no-cache
+RUN npm install --silent --no-cache  --registry=https://registry.npm.taobao.org
 
 # 构建
 RUN npm run build

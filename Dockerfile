@@ -1,25 +1,33 @@
-FROM node:latest
+FROM alpine:3.9
+
+LABEL maintainer="niaoshuai <niao.shuai123@163.com>"
+
+# 修改源
+RUN echo "http://mirrors.aliyun.com/alpine/latest-stable/main/" > /etc/apk/repositories && \
+    echo "http://mirrors.aliyun.com/alpine/latest-stable/community/" >> /etc/apk/repositories
 
 WORKDIR /usr/local/src/iat-h5/
 
-ENV TIME_ZONE="Asia/Shanghai" 
+# 安装NODE 环境
+# RUN apk add --no-cache nodejs
+RUN apk add nodejs
 
-COPY package.json ./
-RUN npm install --silent --no-cache
-
+# 复制文件
 COPY ./ ./
 
-RUN apt-get update
-RUN apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
-  libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 \
-  libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
-  libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
-  ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget 
+# 安装依赖
+RUN npm install --silent --no-cache
 
-RUN  ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo '$TIME_ZONE' > /etc/timezone 
+# 构建
+RUN npm run build
 
-RUN apt clean all
+# 安装nginx
+RUN apk add nginx
 
-RUN npm run test:all
+# 配置nginx
 
-CMD ["npm", "start:no-mock"]
+# 开放80端口
+EXPOSE 80
+
+# 启动nginx命令
+CMD ["nginx", "-g", "daemon off;"]

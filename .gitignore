@@ -32,6 +32,10 @@ functions/mock
 .umi
 .umi-production
 
+# dist
+dist/
+dist/**
+
 # screenshot
 screenshot
 .firebase

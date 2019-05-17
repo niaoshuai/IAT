@@ -22,6 +22,6 @@ services:
     image: registry.cn-beijing.aliyuncs.com/niao/iat-h5:1.0.0
     container_name: iat-h5
     ports:
-    - "8000:8000"
+    - "8000:80"
     links:
     - iat-server

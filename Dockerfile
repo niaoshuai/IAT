@@ -1,3 +1,4 @@
+# https://hub.docker.com/_/nginx 
 FROM nginx:stable-alpine
 
 LABEL maintainer="niaoshuai <niao.shuai123@163.com>"
@@ -15,6 +16,8 @@ WORKDIR /usr/local/src/iat-h5/
 
 # 复制文件
 COPY ./dist/ /usr/share/nginx/html
+
+COPY ./docker/nginx.conf  /etc/nginx/nginx.conf
 
 # 安装依赖
 # RUN npm install --silent --no-cache  --registry=https://registry.npm.taobao.org

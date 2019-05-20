@@ -403,9 +403,11 @@ if '__main__' == __name__:
       setTaskStatus(taskId, 2, "build task script")
       # runJmeterTest(reulstPath)
       runJmeterTestDocker(reulstPath,taskId)
+      
       setTaskStatus(taskId, 3, "excute script sucess")
       try:
-        resultContent = readResult(reulstPath+'/result.csv')
+        RESULT_CSV_PATH=reulstPath+'/result.csv'
+        resultContent = readResult(RESULT_CSV_PATH)
         updateTaskResult(taskId,resultContent,"upload result")
       except Exception as e:
 

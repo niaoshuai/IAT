@@ -720,7 +720,7 @@ def setTaskCount(result):
   jsonResult = json.loads(result)
   total = len(jsonResult)
   for item in jsonResult:
-    if item["success"] == "False":
+    if "success" in item.keys() and item["success"] == "False":
       failCount += 1
     else:
       sucessCount += 1
@@ -732,8 +732,8 @@ def setTaskCount(result):
 def updateTaskResult():
   id = request.json.get("id")
   result = request.json.get("result")
-  taskData = Task.query.filter_by(id=id)
   setTaskCount(result)
+  taskData = Task.query.filter_by(id=id)
   if taskData.first().task_type == 1:
     data = {'result': result}
   else:

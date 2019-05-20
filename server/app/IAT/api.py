@@ -464,6 +464,8 @@ def taskResult():
   fail = []
   for index in range(len(results)):
     results[index]["id"] = caseIds[index]
+    if "success" not in results[index].keys():
+      continue
     if results[index]["success"] == "True":
       sucess.append(caseIds[index])
       results[index]["failureMessage"] = "success"
@@ -720,7 +722,9 @@ def setTaskCount(result):
   jsonResult = json.loads(result)
   total = len(jsonResult)
   for item in jsonResult:
-    if "success" in item.keys() and item["success"] == "False":
+    if "success" in item.keys():
+      continue
+    if item["success"] == "False":
       failCount += 1
     else:
       sucessCount += 1
@@ -748,6 +752,8 @@ def updateTaskResult():
     jsonResult = json.loads(result)
     for item in jsonResult:
       Elapsed += int(item["elapsed"])
+      if "success" in item.keys():
+        continue
       if item["success"] == "False":
         failCount += 1
 

@@ -722,7 +722,7 @@ def setTaskCount(result):
   jsonResult = json.loads(result)
   total = len(jsonResult)
   for item in jsonResult:
-    if "success" in item.keys():
+    if "success" not in item.keys():
       continue
     if item["success"] == "False":
       failCount += 1
@@ -752,7 +752,7 @@ def updateTaskResult():
     jsonResult = json.loads(result)
     for item in jsonResult:
       Elapsed += int(item["elapsed"])
-      if "success" in item.keys():
+      if "success" not in item.keys():
         continue
       if item["success"] == "False":
         failCount += 1

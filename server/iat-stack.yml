@@ -1,0 +1,57 @@
+version: '3.2'
+
+services:
+  iat-server:
+    image: registry.cn-beijing.aliyuncs.com/niao/iat-server:1.0.0
+    container_name: iat-server
+    ports:
+    - "5000"
+    links:
+    - iat-mysql
+    volumes:
+    - iat_data:/jmeter_log
+    - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+    
+  iat-mysql:
+    image: mysql:5.6
+    container_name: iat-mysql
+    ports:
+    - "3306"
+    volumes:
+    - iat_mysql_data:/var/lib/mysql 
+    environment:
+    - MYSQL_DATABASE=IAT
+    - MYSQL_ROOT_PASSWORD=root
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    
+  iat-h5:
+    image: registry.cn-beijing.aliyuncs.com/niao/iat-h5:1.0.0
+    container_name: iat-h5
+    ports:
+    - "8000:80"
+    links:
+    - iat-server
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    
+networks:
+  iat_network:
+    driver: overlay
+    attachable: true
+    
+volumes:
+  iat_data:
+  iat_mysql_data:

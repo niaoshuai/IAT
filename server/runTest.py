@@ -341,7 +341,7 @@ def runJmeterTestDocker1(reulstPath):
   # 初始化执行jmeter集群
   ## 创建jmeter slave web api
   
-  client = docker.from_env()
+  client = docker.DockerClient(base_url='unix://var/run/docker.sock')
   client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',kwargs="")
   client.close
   ## 创建jmeter master web api
@@ -349,8 +349,8 @@ def runJmeterTestDocker1(reulstPath):
 
 
 def curlSlaveCall(jsonFile,reulstPath,taskId):
-  client = docker.from_env()
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}})
+  client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}})
   # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId)
   client.close
 
@@ -360,8 +360,8 @@ def curlMasterCall(jsonFile,reulstPath,taskId):
   # 创建空文件
   os.mknod(RESULT_CSV_PATH)
 
-  client = docker.from_env()
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,volumes={'iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
+  client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
   # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,links={"jmeter-slave-"+taskId:"jmeter-slave"})
   client.close
 

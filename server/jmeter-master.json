@@ -12,7 +12,7 @@
         "-X"
     ],
     "HostConfig": {
-        "Binds": ["/home/niaoshuai/docker_mnt:/jmeter_log:rw"],
+        "Volumes": ["iat_iat_data:/jmeter_log:rw"],
         "Links": ["jmeter-slave:jmeter-slave"]
     }
 }

@@ -5,6 +5,6 @@
         "/jmeter_log/slave1.log"
     ],
     "HostConfig": {
-        "Binds": ["/home/niaoshuai/docker_mnt:/jmeter_log:rw"]
+        "Binds": ["iat_iat_data:/jmeter_log:rw"]
     }
 }

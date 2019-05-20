@@ -350,12 +350,19 @@ def runJmeterTestDocker1(reulstPath):
 
 def curlSlaveCall(jsonFile,reulstPath,taskId):
   client = docker.from_env()
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'/home/niaoshuai/docker_mnt': {'bind': '/jmeter_log', 'mode': 'rw'}})
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}})
+  # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId)
   client.close
 
 def curlMasterCall(jsonFile,reulstPath,taskId):
+  JMX_PATH=reulstPath+'/test.jmx'
+  RESULT_CSV_PATH=reulstPath+'/result.csv'
+  # 创建空文件
+  os.mknod(RESULT_CSV_PATH)
+
   client = docker.from_env()
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+reulstPath+'/test.jmx'+' -R jmeter-slave -l '+reulstPath+'/result.csv'+' -X',name="jmeter-master-"+taskId,volumes={'/home/niaoshuai/docker_mnt': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,volumes={'iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
+  # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,links={"jmeter-slave-"+taskId:"jmeter-slave"})
   client.close
 
 def runJmeterTest1(reulstPath):

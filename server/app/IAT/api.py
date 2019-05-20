@@ -750,10 +750,13 @@ def updateTaskResult():
     failCount = 0
     Elapsed = 0
     jsonResult = json.loads(result)
+    print(jsonResult)
     for item in jsonResult:
       Elapsed += int(item["elapsed"])
+     
       if "success" not in item.keys():
         continue
+    
       if item["success"] == "False":
         failCount += 1
 

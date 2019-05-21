@@ -373,7 +373,7 @@ def runJmeterTest1(reulstPath):
 
 def readResult(path):
   # 打开文件
-  data = pd.read_csv(path,sep=",")
+  data = pd.read_csv(path,encoding='utf8',header=None)
   columns = data.columns
   values = data.values
   content = []

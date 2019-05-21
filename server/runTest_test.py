@@ -23,7 +23,7 @@ class TestRunJmeterTest(unittest.TestCase):
     #   tree.write(reulstPath+'/test.jmx', encoding="utf-8")
 
     def test_read(self):
-      print(readResult("/var/lib/docker/volumes/iat_iat_data/_data/2019-05-21_09_43_26/result.csv"))
+      print(readResult("/var/lib/docker/volumes/iat_iat_data/_data/2019-05-21_09_21_37/result.csv"))
 
 
 

@@ -373,7 +373,8 @@ def runJmeterTest1(reulstPath):
 
 def readResult(path):
   # 打开文件
-  data = pd.read_csv(path,encoding='utf8',header=None)
+  names = ['timeStamp','elapsed','label','responseCode','responseMessage','threadName','dataType','success','failureMessage','bytes','sentBytes','grpThreads','allThreads','URL','Latency','IdleTime','Connect']
+  data = pd.read_csv(path,encoding='utf8',names=names)
   columns = data.columns
   values = data.values
   content = []

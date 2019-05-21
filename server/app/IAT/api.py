@@ -471,11 +471,11 @@ def taskResult():
       results[index]["failureMessage"] = "success"
     if results[index]["success"] == "False":
       fail.append(caseIds[index])
-  if len(results) > 0:
+  if len(results) > 0 and "timeStamp" in results[0].keys():
     startTime = results[0]["timeStamp"]
   else:
     startTime = 0
-  if len(results) > 1:
+  if len(results) > 1 and "timeStamp" in results[len(results) - 1].keys():
     endTime = results[len(results) - 1]["timeStamp"]
   else:
     endTime = startTime

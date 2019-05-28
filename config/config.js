@@ -49,7 +49,7 @@ const plugins = [
 export default {
   // add for transfer to umi
   history: 'hash',
-  hash:true,
+  hash: true,
   plugins,
   targets: {
     ie: 11,
@@ -69,7 +69,7 @@ export default {
   },
   proxy: {
     '/api/': {
-      target: 'http://localhost:5000',
+      target: 'http://localhost:8000',
       changeOrigin: true,
       // pathRewrite: { '^/server': '' },
     },

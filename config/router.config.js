@@ -169,10 +169,17 @@ export default [
             name: 'project',
             component: './System/project',
           },
+        ],
+      },
+      {
+        path: '/info',
+        name: 'info',
+        icon: 'code-sandbox',
+        routes: [
           {
-            path: '/system/jmeter',
-            name: 'jmeter',
-            component: './System/jmeter',
+            path: '/info',
+            name: 'info',
+            component: './Info',
           },
         ],
       },

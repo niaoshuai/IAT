@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import RouterConfig from '../../config/router.config';
 
-const BASE_URL = `http://localhost:${process.env.PORT || 5000}`;
+const BASE_URL = `http://localhost:${process.env.PORT || 8000}`;
 
 function formatter(data) {
   return data

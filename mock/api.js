@@ -321,6 +321,12 @@ function getFakeCaptcha(req, res) {
   return res.json('captcha-xxx');
 }
 
+/* API MOCK */
+
+function getTaskList() {
+  return '';
+}
+
 export default {
   'GET /api/project/notice': getNotice,
   'GET /api/activities': getActivities,

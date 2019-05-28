@@ -7,6 +7,16 @@ export async function queryAddProject(params) {
     body: params,
   });
 }
+/**
+ * 添加压力
+ * @param {参数} params
+ */
+export async function queryAddPressureTask(params) {
+  return request('/api/IAT/addPressureTask', {
+    method: 'POST',
+    body: params,
+  });
+}
 
 export async function queryAddTask(params) {
   return request('/api/IAT/addTask', {

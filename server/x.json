@@ -1,101 +1,101 @@
 {
     "caseIds": [
-    176, 
-    175
-    ], 
-    "domain": "http://192.168.11.206:8081", 
-    "headers": [], 
+        176,
+        175
+    ],
+    "domain": "http://192.168.11.206:8081",
+    "headers": [],
     "params": [
-    null, 
-    {
-        "key": "token", 
-        "value": "A703C6A1AA664FBCBF5D303A5879828D"
-    }
-    ], 
-    "project": 10, 
-    "proxy": "", 
-    "runTime": "12:08", 
+        null,
+        {
+            "key": "token",
+            "value": "A703C6A1AA664FBCBF5D303A5879828D"
+        }
+    ],
+    "project": 10,
+    "proxy": "",
+    "runTime": "12:08",
     "samples": [
-    {
-        "asserts": {
-        "assertData": [
-            {
-            "id": 1557713007227, 
-            "key": "$.result", 
-            "value": "000000"
-            }
-        ], 
-        "assertType": 2
-        }, 
-        "extract": {
-        "extractData": [
-            {
-            "id": 1557713007227, 
-            "key": "subjectId", 
-            "value": "$.data.data[*].subjectId"
-            }
-        ], 
-        "extractType": 1
-        }, 
-        "id": 106, 
-        "method": "GET", 
-        "name": "\u79d1\u76ee\u5217\u8868", 
-        "paramType": 1, 
-        "params": [
         {
-            "id": 1557713007236, 
-            "key": "params", 
-            "type": false, 
-            "value": "{\"classUniquecode\":\"ERJIAN\"}"
-        }
-        ], 
-        "path": "/apiservice/api/qb/subject/profile/list", 
-        "postShellData": "", 
-        "postShellType": 0, 
-        "preShellData": "", 
-        "preShellType": 0
-    }, 
-    {
-        "asserts": {
-        "assertData": [
-            {
-            "id": 1557713007204, 
-            "key": "$.result", 
-            "value": "000000"
-            }
-        ], 
-        "assertType": 2
-        }, 
-        "extract": {
-        "extractData": [
-            {
-            "id": 1557734833533, 
-            "key": "token", 
-            "value": "$.data.token"
-            }
-        ], 
-        "extractType": 1
-        }, 
-        "id": 105, 
-        "method": "GET", 
-        "name": "\u767b\u5f55", 
-        "paramType": 1, 
-        "params": [
+            "asserts": {
+                "assertData": [
+                    {
+                        "id": 1557713007227,
+                        "key": "$.result",
+                        "value": "000000"
+                    }
+                ],
+                "assertType": 2
+            },
+            "extract": {
+                "extractData": [
+                    {
+                        "id": 1557713007227,
+                        "key": "subjectId",
+                        "value": "$.data.data[*].subjectId"
+                    }
+                ],
+                "extractType": 1
+            },
+            "id": 106,
+            "method": "GET",
+            "name": "\u79d1\u76ee\u5217\u8868",
+            "paramType": 1,
+            "params": [
+                {
+                    "id": 1557713007236,
+                    "key": "params",
+                    "type": false,
+                    "value": "{\"classUniquecode\":\"ERJIAN\"}"
+                }
+            ],
+            "path": "/apiservice/api/qb/subject/profile/list",
+            "postShellData": "",
+            "postShellType": 0,
+            "preShellData": "",
+            "preShellType": 0
+        },
         {
-            "id": 1557713007217, 
-            "key": "params", 
-            "type": false, 
-            "value": "{ \"userLoginname\":\"student\", \"userLoginpwd\":\"\",\"captcha\":{ \"captchaToken\":null, \"captchaValue\":\"\" },  \"userFlag\":\"S\" }"
+            "asserts": {
+                "assertData": [
+                    {
+                        "id": 1557713007204,
+                        "key": "$.result",
+                        "value": "000000"
+                    }
+                ],
+                "assertType": 2
+            },
+            "extract": {
+                "extractData": [
+                    {
+                        "id": 1557734833533,
+                        "key": "token",
+                        "value": "$.data.token"
+                    }
+                ],
+                "extractType": 1
+            },
+            "id": 105,
+            "method": "GET",
+            "name": "\u767b\u5f55",
+            "paramType": 1,
+            "params": [
+                {
+                    "id": 1557713007217,
+                    "key": "params",
+                    "type": false,
+                    "value": "{ \"userLoginname\":\"student\", \"userLoginpwd\":\"\",\"captcha\":{ \"captchaToken\":null, \"captchaValue\":\"\" },  \"userFlag\":\"S\" }"
+                }
+            ],
+            "path": "/apiservice/api/uc/login",
+            "postShellData": "",
+            "postShellType": 0,
+            "preShellData": "",
+            "preShellType": 0
         }
-        ], 
-        "path": "/apiservice/api/uc/login", 
-        "postShellData": "", 
-        "postShellType": 0, 
-        "preShellData": "", 
-        "preShellType": 0
-    }
-    ], 
-    "taskDesc": "", 
-    "taskType": 1, 
+    ],
+    "taskDesc": "",
+    "taskType": 1,
     "testname": "2"
 }

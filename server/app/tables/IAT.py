@@ -124,3 +124,28 @@ class Task(db.Model):
     self.update_time = datetime.now()
     self.user_id = user_id
     self.status = status
+
+
+class TaskPressure(db.Model):
+  __tablename__ = 'task_pressure'
+  id = db.Column(db.Integer, primary_key=True)
+  task_id = db.Column(db.Integer)
+  rps = db.Column(db.Integer)
+  time = db.Column(db.Integer)
+  up = db.Column(db.Integer)
+  user_id = db.Column(db.Integer)
+  # 0 初始化执行状态  1 获取任务状态  2 构建任务脚本 3 执行完成 4 获取任务信息失败  5 构建压测脚本失败
+  status = db.Column(db.Integer)
+  gmt_create = db.Column(db.DateTime)
+  gmt_modified = db.Column(db.DateTime)
+
+  def __init__(self,task_id,rps,time,up,user_id,status):
+    self.task_total = task_total
+    self.task_id = task_id
+    self.rps = rps
+    self.time = time
+    self.up = up
+    self.user_id = user_id
+    self.status = status
+    self.gmt_create = datetime.now()
+    

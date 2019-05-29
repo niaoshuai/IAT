@@ -1,6 +1,6 @@
 # -*-coding:utf-8-*-
 from flask import Blueprint, jsonify, make_response, session, request
-from app.tables.IAT import Project, Tree, Sample, Task, TaskCount
+from app.tables.IAT import Project, Tree, Sample, Task, TaskCount, TaskPressure
 from app.tables.User import users
 import os,hashlib,subprocess, json, requests, time,datetime,random
 from sqlalchemy import extract
@@ -430,6 +430,58 @@ def taskInfo():
   return make_response(jsonify({'code': 0, 'content': content, 'msg': u''}))
 
 
+@api.route('/taskPressureInfo')
+def taskPressureInfo():
+  id = request.values.get("id")
+  # 获取 Pressure
+  taskPressureData = TaskPressure.query.filter(db.and_(TaskPressure.id == id, )).first()
+
+  taskData = Task.query.filter(db.and_(Task.id == taskPressureData.task_id, )).first()
+  sampleIds = json.loads(taskData.case)
+  samples = []
+  caseIds = []
+  for id in sampleIds:
+    sampleData = Sample.query.filter_by(pid=id).first()
+    sampleName = Tree.query.filter_by(id=id).first().name
+    if sampleData:
+      caseIds.append(sampleData.pid)
+      samples.append({
+        "id": sampleData.id,
+        "name": sampleName,
+        "path": sampleData.path,
+        "method": sampleData.method,
+        "paramType": sampleData.param_type,
+        "params": json.loads(sampleData.params),
+        "asserts": {
+          "assertType": sampleData.asserts_type,
+          "assertData": json.loads(sampleData.asserts_data),
+        },
+        "extract": {
+          "extractType": sampleData.extract_type,
+          "extractData": json.loads(sampleData.extract_data),
+        },
+        "preShellType":sampleData.pre_shell_type,
+        "preShellData":sampleData.pre_shell_data,
+        "postShellType":sampleData.post_shell_type,
+        "postShellData":sampleData.post_shell_data,
+      })
+  content = {
+    "testname": taskData.name,
+    "domain": taskData.domain,
+    "headers": json.loads(taskData.headers),
+    "params": json.loads(taskData.params),
+    "proxy": taskData.proxy,
+    "taskDesc": taskData.task_desc,
+    "taskType": taskData.task_type,
+    "runTime": taskData.run_time,
+    "project": taskData.project_id,
+    "samples": samples,
+    "caseIds": caseIds,
+    "pressureData":taskPressureData,
+  }
+  return make_response(jsonify({'code': 0, 'content': content, 'msg': u''}))
+
+
 @api.route('/getTaskStatus')
 def getTaskStatus():
   id = request.values.get("id")
@@ -548,6 +600,50 @@ def taskDelete():
     print(e)
 
     return make_response(jsonify({'code': 10001, 'content': None, 'msg': u'删除失败!'}))
+
+# 新增压力任务
+@api.route('/addPressureTask', methods=['POST'])
+def taskExcute():
+  user_id = session.get('user_id')
+  # 任务ID
+  taskId = request.json.get("taskId") 
+  # 压测配置
+  info = request.json.get("info") 
+
+  taskPressureData = TaskPressure.query.filter_by(task_id=taskId)
+  if taskPressureData.first():
+    status = taskPressureData.first().status
+    if status != 3:
+      return make_response(jsonify({'code': 10001, 'msg': u'已经有一个压测任务在执行了!', 'content': None}))
+  # 保存压测配置(持久化)
+  addPressureData = TaskPressure(taskId, info["rps"], info["time"], info["up"], user_id, 0)
+  db.session.add(addPressureData)
+  db.session.commit()
+
+# 更新压力任务状态
+@api.route('/updatePressureTaskStatus', methods=['POST'])
+def updatePressureTaskStatus():
+  id = request.json.get("id")
+  status = request.json.get("status")
+  data = {'status': status}
+  taskData = TaskPressure.query.filter_by(id=id)
+  if taskData.first():
+    taskData.update(data)
+    db.session.commit()
+    return make_response(jsonify({'code': 0, 'msg': 'sucess', 'content': []}))
+  else:
+    return make_response(jsonify({'code': 10001, 'msg': 'fail', 'content': []}))
+
+  
+  
+
+  # taskType = taskData.first().task_type
+  # if taskType == 2:
+  #   # subprocess.Popen('python runTiming.py %s' % id, shell=True)
+  # else:
+  subprocess.Popen('python runPressureTest.py %s' % addPressureData.id, shell=True)
+  return make_response(jsonify({'code': 0, 'content': None, 'msg': u'开始执行!'}))
+    
 
 
 @api.route('/getTreeInfo', methods=['POST'])

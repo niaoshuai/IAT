@@ -603,7 +603,7 @@ def taskDelete():
 
 # 新增压力任务
 @api.route('/addPressureTask', methods=['POST'])
-def taskExcute():
+def taskPressureExcute():
   user_id = session.get('user_id')
   # 任务ID
   taskId = request.json.get("taskId") 

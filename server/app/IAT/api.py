@@ -465,6 +465,18 @@ def taskPressureInfo():
         "postShellType":sampleData.post_shell_type,
         "postShellData":sampleData.post_shell_data,
       })
+
+  taskPressureDataJson = {
+    "id":taskPressureData.id,
+    "rps":taskPressureData.rps,
+    "task_id":taskPressureData.task_id,
+    "time":taskPressureData.time,
+    "up":taskPressureData.up,
+    "user_id":taskPressureData.user_id,
+    "status":taskPressureData.status,
+    "gmt_create":taskPressureData.gmt_create,
+  }
+  
   content = {
     "testname": taskData.name,
     "domain": taskData.domain,
@@ -477,7 +489,7 @@ def taskPressureInfo():
     "project": taskData.project_id,
     "samples": samples,
     "caseIds": caseIds,
-    "pressureData":taskPressureData,
+    "pressureData":taskPressureDataJson,
   }
   return make_response(jsonify({'code': 0, 'content': content, 'msg': u''}))
 
@@ -579,9 +591,9 @@ def taskExcute():
     db.session.commit()
     taskType = taskData.first().task_type
     if taskType == 2:
-      subprocess.Popen('python runTiming.py %s' % id, shell=True)
+      subprocess.Popen('python3 runTiming.py %s' % id, shell=True)
     else:
-      subprocess.Popen('python runTest.py %s' % id, shell=True)
+      subprocess.Popen('python3 runTest.py %s' % id, shell=True)
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'开始执行!'}))
   else:
     return make_response(jsonify({'code': 10001, 'msg': u'执行失败!', 'content': None}))
@@ -620,6 +632,11 @@ def taskPressureExcute():
   db.session.add(addPressureData)
   db.session.commit()
 
+  # 执行压测
+  subprocess.Popen('python3 runPressureTest.py %s' % addPressureData.id, shell=True)
+
+  return make_response(jsonify({'code': 0, 'msg': 'sucess', 'content': []}))
+
 # 更新压力任务状态
 @api.route('/updatePressureTaskStatus', methods=['POST'])
 def updatePressureTaskStatus():
@@ -633,15 +650,11 @@ def updatePressureTaskStatus():
     return make_response(jsonify({'code': 0, 'msg': 'sucess', 'content': []}))
   else:
     return make_response(jsonify({'code': 10001, 'msg': 'fail', 'content': []}))
-
-  
-  
-
   # taskType = taskData.first().task_type
   # if taskType == 2:
-  #   # subprocess.Popen('python runTiming.py %s' % id, shell=True)
+  #   # subprocess.Popen('python3 runTiming.py %s' % id, shell=True)
   # else:
-  subprocess.Popen('python runPressureTest.py %s' % addPressureData.id, shell=True)
+  subprocess.Popen('python3 runPressureTest.py %s' % addPressureData.id, shell=True)
   return make_response(jsonify({'code': 0, 'content': None, 'msg': u'开始执行!'}))
     
 
@@ -1108,17 +1121,20 @@ def uploadFile():
     fileHash = encrypt_name(upload_file.filename)
     fileType = upload_file.filename.split('.')[-1]
     fileName = fileHash + '.' + fileType
-    upload_file.save(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], fileName))
-    filePath = 'app/'+app.config['UPLOAD_FOLDER']+fileName
+
+    fileRealPath = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], fileName)
+    upload_file.save(fileRealPath)
+
+    # filePath = app.root_path+'/'+app.config['UPLOAD_FOLDER']+fileName
     projectRootId = Tree.query.filter_by(project_id=id,pid=0).first().id
     if fileType == 'har':
       print("开始导入har")
-      subprocess.call('python runAutoBuild.py %s %s %s'%(user_id,projectRootId,filePath),shell=True)
-      os.remove(filePath)
+      subprocess.Popen('python3 runAutoBuild.py %s %s %s'%(user_id,projectRootId,fileRealPath),shell=True)
+      # os.remove(fileRealPath)
     if fileType == 'jmx':
       print('开始导入jmx')
-      subprocess.call('python runAutoBuildFromJmx.py %s %s %s' % (user_id,projectRootId, filePath), shell=True)
-      os.remove(filePath)
+      subprocess.Popen('python3 runAutoBuildFromJmx.py %s %s %s' % (user_id,projectRootId, fileRealPath), shell=True)
+      # os.remove(fileRealPath)
     return make_response(jsonify({'code': 0, 'content':None, 'msg': 'upload sucess'}))
   else:
     return make_response(jsonify({'code': 10002, 'content':None, 'msg': 'upload fail!'}))

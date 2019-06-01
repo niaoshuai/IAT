@@ -1,5 +1,5 @@
 #-*-coding:utf-8-*-
-import time,requests,json,subprocess
+import time,json,subprocess,requests
 
 def runTask():
   data = {'taskType': 2}
@@ -16,7 +16,7 @@ def runTask():
     for task in response["content"]:
         if task["status"] not in [0,4]:
             print ("开始定时任务:taskId-",task["id"],"runTime-",task["runTime"])
-            subprocess.Popen('python runTiming.py %s' % task["id"], shell=True)
+            subprocess.Popen('python3 runTiming.py %s' % task["id"], shell=True)
 
 def main():
     time.sleep(30)

@@ -420,8 +420,7 @@ def readResult(path):
 
 if '__main__' == __name__:
    ## 获取任务ID  没有service 暂时使用接口调用
-  # pressureTaskId = sys.argv[1]
-  pressureTaskId = 35
+  pressureTaskId = sys.argv[1]
   url = 'http://127.0.0.1:5000/api/IAT/taskPressureInfo'
   params = {"id":pressureTaskId}
   res = requests.get(url,params=params)

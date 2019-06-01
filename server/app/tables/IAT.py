@@ -140,7 +140,7 @@ class TaskPressure(db.Model):
   gmt_modified = db.Column(db.DateTime)
 
   def __init__(self,task_id,rps,time,up,user_id,status):
-    self.task_total = task_total
+    # self.task_total = task_total
     self.task_id = task_id
     self.rps = rps
     self.time = time

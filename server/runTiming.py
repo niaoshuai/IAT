@@ -15,7 +15,7 @@ def getTaskStatus(taskId):
     return None,None
 
 def start_job(taskId):
-    subprocess.call("python runTest.py %s "%taskId,shell=True)
+    subprocess.Popen("python3 runTest.py %s "%taskId,shell=True)
 
 def stop_job(taskId):
     status,runTime = getTaskStatus(taskId)

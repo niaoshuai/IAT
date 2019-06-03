@@ -398,7 +398,7 @@ if '__main__' == __name__:
       tree.write(reulstPath+'/test.jmx',encoding="utf-8")
       setTaskStatus(pressureTaskId, 2, "build task script")
       # runJmeterTest(reulstPath)
-      runJmeterTestDocker(reulstPath,pressureTaskId,response["content"]["pressureData"].ins_count)
+      runJmeterTestDocker(reulstPath,pressureTaskId,response["content"]["pressureData"],1)
       
       setTaskStatus(pressureTaskId, 3, "excute script sucess")
       try:

@@ -54,6 +54,7 @@ const PressureTaskForm = Form.create({
       const rps = form.getFieldValue('rps');
       const time = form.getFieldValue('time');
       const up = form.getFieldValue('up');
+      // const ins_count = form.getFieldValue('ins_count');
 
       if (rps != undefined && time != undefined && up != undefined) {
         const dataTmp = [];
@@ -99,6 +100,11 @@ const PressureTaskForm = Form.create({
           onOk={onCreate}
         >
           <Form layout="vertical" onChange={this.handleFormChange}>
+            <Form.Item label="压力机个数">
+              {getFieldDecorator('ins_count', {
+                rules: [{ required: true, message: '压力机个数' }],
+              })(<InputNumber formatter={value => `${value}`} min={1} max={100} />)}
+            </Form.Item>
             <Form.Item label="选择输入RPS(每秒请求数)">
               {getFieldDecorator('rps', {
                 rules: [{ required: true, message: '选择输入RPS' }],

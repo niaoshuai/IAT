@@ -133,13 +133,14 @@ class TaskPressure(db.Model):
   rps = db.Column(db.Integer)
   time = db.Column(db.Integer)
   up = db.Column(db.Integer)
+  ins_count = db.Column(db.Integer)
   user_id = db.Column(db.Integer)
   # 0 初始化执行状态  1 获取任务状态  2 构建任务脚本 3 执行完成 4 获取任务信息失败  5 构建压测脚本失败
   status = db.Column(db.Integer)
   gmt_create = db.Column(db.DateTime)
   gmt_modified = db.Column(db.DateTime)
 
-  def __init__(self,task_id,rps,time,up,user_id,status):
+  def __init__(self,task_id,rps,time,up,user_id,status,ins_count):
     # self.task_total = task_total
     self.task_id = task_id
     self.rps = rps
@@ -148,4 +149,5 @@ class TaskPressure(db.Model):
     self.user_id = user_id
     self.status = status
     self.gmt_create = datetime.now()
+    self.ins_count = ins_count
     

@@ -78,6 +78,7 @@ CREATE TABLE `task_pressure` (
   `rps` bigint unsigned NOT NULL,
   `time` bigint unsigned NOT NULL,
   `up` bigint unsigned NOT NULL,
+  `ins_count` smallint NOT NULL,
   `user_id` bigint unsigned NOT NULL,
   `status` smallint(6) NOT NULL,
   `gmt_create` datetime,

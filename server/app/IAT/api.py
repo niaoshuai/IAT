@@ -472,6 +472,7 @@ def taskPressureInfo():
     "task_id":taskPressureData.task_id,
     "time":taskPressureData.time,
     "up":taskPressureData.up,
+    "ins_count":taskPressureData.ins_count,
     "user_id":taskPressureData.user_id,
     "status":taskPressureData.status,
     "gmt_create":taskPressureData.gmt_create,
@@ -628,7 +629,7 @@ def taskPressureExcute():
     if status != 3:
       return make_response(jsonify({'code': 10001, 'msg': u'已经有一个压测任务在执行了!', 'content': None}))
   # 保存压测配置(持久化)
-  addPressureData = TaskPressure(taskId, info["rps"], info["time"], info["up"], user_id, 0)
+  addPressureData = TaskPressure(taskId, info["rps"], info["time"], info["up"], user_id, 0,info["ins_count"])
   db.session.add(addPressureData)
   db.session.commit()
 

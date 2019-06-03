@@ -346,7 +346,7 @@ def runJmeterTestDocker(reulstPath,taskId,ins_count):
 
 def curlSlaveCall(jsonFile,reulstPath,taskId,ins_count):
   client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}})
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.1','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}})
   client.close
 
 def curlMasterCall(jsonFile,reulstPath,taskId):

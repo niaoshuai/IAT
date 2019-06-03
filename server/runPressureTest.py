@@ -324,67 +324,29 @@ def makeResultPath(now):
 # 此处为Jmeter容器间 docker (curl)
 # https://docs.docker.com/develop/sdk/
 # https://docs.docker.com/engine/api/v1.24/
-def runJmeterTestDocker(reulstPath,taskId):
+def runJmeterTestDocker(reulstPath,taskId,ins_count):
   # 初始化执行jmeter集群
   ## 创建jmeter slave web api
-  curlSlaveCall('jmeter-slave.json',reulstPath,taskId)
+  curlSlaveCall('jmeter-slave.json',reulstPath,taskId,ins_count)
  
-  ## 创建jmeter master web api
+  # ## 创建jmeter master web api
   curlMasterCall('jmeter-master.json',reulstPath,taskId)
 
-  ## 启动slave master
+  # client = docker.APIClient(base_url='unix://var/run/docker.sock')
+  # container_spec = docker.types.ContainerSpec(
+  #   image='busybox', command=['echo', 'hello']
+  # )
+  # task_tmpl = docker.types.TaskTemplate(container_spec)
+  # service_id = client.create_service(task_tmpl, name='jmeter')
 
-# def curlSlaveCall(jsonFile,reulstPath):
-#   response = BytesIO()
-#   curl = pycurl.Curl()
-#   curl.setopt(pycurl.WRITEFUNCTION, response.write)
-#   curl.setopt(pycurl.URL,"http:/v1.24/containers/create?name=jmeter-slave")
-#   curl.setopt(pycurl.HTTPHEADER,['Content-Type: application/json','Accept-Charset: UTF-8'])
-#   curl.setopt(pycurl.UNIX_SOCKET_PATH,"/var/run/docker.sock")
-#   # curl.setopt(pycurl.p)
-#   my_json_data = json.load(open(jsonFile))
-#   curl.setopt(pycurl.POSTFIELDS,json.dumps(my_json_data))
-#   curl.perform()
-#   the_page = response.getvalue()
-#   print(the_page)
-#   response.close()
+  # client.close
 
-
-# def curlMasterCall(jsonFile,reulstPath):
-#   response = BytesIO()
-#   curl = pycurl.Curl()
-#   curl.setopt(pycurl.WRITEFUNCTION, response.write)
-#   curl.setopt(pycurl.URL,"http:/v1.24/containers/create?name=jmeter-master")
-#   curl.setopt(pycurl.HTTPHEADER,['Content-Type: application/json','Accept-Charset: UTF-8'])
-#   curl.setopt(pycurl.UNIX_SOCKET_PATH,"/var/run/docker.sock")
-#   my_json_data = json.load(open(jsonFile))
-#   my_json_data['Cmd'][1] = reulstPath
-#   my_json_data['Cmd'][3] = 'jmeter-slave'
-#   my_json_data['Cmd'][7] = '/jmeter_log/x.csv'
-#   curl.setopt(pycurl.POSTFIELDS,json.dumps(my_json_data))
-#   curl.perform()
-#   the_page = response.getvalue()
-#   print(the_page)
-#   response.close()
-
-# 此处为Jmeter容器间 docker  (python docker)
-# https://docs.docker.com/develop/sdk/
-# https://docs.docker.com/engine/api/v1.39/#tag/Service
-def runJmeterTestDocker1(reulstPath):
-  # 初始化执行jmeter集群
-  ## 创建jmeter slave web api
-  
-  client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',kwargs="")
-  client.close
-  ## 创建jmeter master web api
   ## 启动slave master
 
 
-def curlSlaveCall(jsonFile,reulstPath,taskId):
+def curlSlaveCall(jsonFile,reulstPath,taskId,ins_count):
   client = docker.DockerClient(base_url='unix://var/run/docker.sock')
   client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}})
-  # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.0','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId)
   client.close
 
 def curlMasterCall(jsonFile,reulstPath,taskId):
@@ -398,11 +360,11 @@ def curlMasterCall(jsonFile,reulstPath,taskId):
   client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
   client.close
 
-def runJmeterTest1(reulstPath):
-  #cmd = "jmeter -n -t %s -l %s -e -o %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv',reulstPath+'/resultDir')
-  cmd = "jmeter -n -t %s -l %s "%(reulstPath,'/home/niaoshuai/test/result.csv')
-  print(cmd)
-  subprocess.call(cmd, shell=True)
+# def runJmeterTest1(reulstPath):
+#   #cmd = "jmeter -n -t %s -l %s -e -o %s "%(reulstPath+'/testData.jmx',reulstPath+'/result.csv',reulstPath+'/resultDir')
+#   cmd = "jmeter -n -t %s -l %s "%(reulstPath,'/home/niaoshuai/test/result.csv')
+#   print(cmd)
+#   subprocess.call(cmd, shell=True)
 
 def readResult(path):
   # 打开文件
@@ -436,7 +398,7 @@ if '__main__' == __name__:
       tree.write(reulstPath+'/test.jmx',encoding="utf-8")
       setTaskStatus(pressureTaskId, 2, "build task script")
       # runJmeterTest(reulstPath)
-      runJmeterTestDocker(reulstPath,pressureTaskId)
+      runJmeterTestDocker(reulstPath,pressureTaskId,response["content"]["pressureData"].ins_count)
       
       setTaskStatus(pressureTaskId, 3, "excute script sucess")
       try:

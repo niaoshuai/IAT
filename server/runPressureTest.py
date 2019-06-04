@@ -279,7 +279,7 @@ def set_data(tree,data,pressureData):
   ### nodeName
   elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"nodeName"})
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "nodeName"
-  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = ""
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "nodeName"
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
   BackendListenerCollectionProp.append(elementProp_testname)
   ### influxDBHost

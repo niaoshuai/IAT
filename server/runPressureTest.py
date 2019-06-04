@@ -22,7 +22,7 @@ def setTaskPressureStatus(taskId,status,msg):
   response = res.json()
   print(response["msg"])
 
-def updateTaskResult(taskId,result,msg):
+def updateTaskPressureResult(taskId,result,msg):
   data = {'id':taskId,'result':json.dumps(result)}
   headers = {'Content-Type':'application/json'}
   url = 'http://127.0.0.1:5000/api/IAT/updateTaskResult'
@@ -400,9 +400,9 @@ if '__main__' == __name__:
       
       setTaskPressureStatus(pressureTaskId, 3, "excute script sucess")
       try:
-        RESULT_CSV_PATH=reulstPath+'/result.csv'
-        resultContent = readResult(RESULT_CSV_PATH)
-        updateTaskResult(pressureTaskId,resultContent,"upload result")
+        # RESULT_CSV_PATH=reulstPath+'/result.csv'
+        # resultContent = readResult(RESULT_CSV_PATH)
+        updateTaskPressureResult(pressureTaskId,'resultContent',"upload result")
       except Exception as e:
         print(e)
         setTaskPressureStatus(pressureTaskId, 5, "task fail,please check jmeter env")

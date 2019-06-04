@@ -14,7 +14,7 @@ if sys.getdefaultencoding() != default_encoding:
   sys.setdefaultencoding(default_encoding)
 
 #状态设置请求
-def setTaskStatus(taskId,status,msg):
+def setTaskPressureStatus(taskId,status,msg):
   data = {'id':taskId,'status':status}
   headers = {'Content-Type':'application/json'}
   url = 'http://127.0.0.1:5000/api/IAT/updatePressureTaskStatus'
@@ -263,8 +263,6 @@ def set_data(tree,data,pressureData):
     ## 追加
     VariableThroughputTimerCollectionProp.append(collectionProp)
   
-
-
   #设置项目名称
   UltimateThreadGroup.set('testname', data["testname"])
   #设置请求headers默认参数
@@ -324,13 +322,13 @@ def makeResultPath(now):
 # 此处为Jmeter容器间 docker (curl)
 # https://docs.docker.com/develop/sdk/
 # https://docs.docker.com/engine/api/v1.24/
-def runJmeterTestDocker(reulstPath,taskId,ins_count):
+def runJmeterTestDocker(reulstPath,taskPressureId,ins_count):
   # 初始化执行jmeter集群
   ## 创建jmeter slave web api
-  curlSlaveCall('jmeter-slave.json',reulstPath,taskId,ins_count)
+  curlSlaveCall('jmeter-slave.json',reulstPath,taskPressureId,ins_count)
  
   # ## 创建jmeter master web api
-  curlMasterCall('jmeter-master.json',reulstPath,taskId)
+  curlMasterCall('jmeter-master.json',reulstPath,taskPressureId)
 
   # client = docker.APIClient(base_url='unix://var/run/docker.sock')
   # container_spec = docker.types.ContainerSpec(
@@ -357,7 +355,7 @@ def curlMasterCall(jsonFile,reulstPath,taskId):
 
   client = docker.DockerClient(base_url='unix://var/run/docker.sock')
   # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.1','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
   client.close
 
 # def runJmeterTest1(reulstPath):
@@ -389,29 +387,27 @@ if '__main__' == __name__:
   response = res.json()
   if response["code"] == 0:
     try:
-      setTaskStatus(pressureTaskId, 1, "get task info")
+      setTaskPressureStatus(pressureTaskId, 1, "get task info")
       now = datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
       reulstPath = makeResultPath(now)
       tree = read_demo('templete-pressure.jmx')
       tree = set_data(tree,data=response["content"],pressureData=response["content"]["pressureData"])
       indent(tree.getroot())
       tree.write(reulstPath+'/test.jmx',encoding="utf-8")
-      setTaskStatus(pressureTaskId, 2, "build task script")
+      setTaskPressureStatus(pressureTaskId, 2, "build task script")
       # runJmeterTest(reulstPath)
       runJmeterTestDocker(reulstPath,pressureTaskId,1)
       
-      setTaskStatus(pressureTaskId, 3, "excute script sucess")
+      setTaskPressureStatus(pressureTaskId, 3, "excute script sucess")
       try:
         RESULT_CSV_PATH=reulstPath+'/result.csv'
         resultContent = readResult(RESULT_CSV_PATH)
         updateTaskResult(pressureTaskId,resultContent,"upload result")
       except Exception as e:
-
         print(e)
-        setTaskStatus(pressureTaskId, 5, "task fail,please check jmeter env")
+        setTaskPressureStatus(pressureTaskId, 5, "task fail,please check jmeter env")
     except Exception as e:
-
       print (e)
-      setTaskStatus(pressureTaskId, 5, "build task script fail")
+      setTaskPressureStatus(pressureTaskId, 6, "build task script fail")
   else:
-    setTaskStatus(pressureTaskId,4,"get task info fail")
+    setTaskPressureStatus(pressureTaskId,4,"get task info fail")

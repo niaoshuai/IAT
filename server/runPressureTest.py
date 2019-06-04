@@ -262,6 +262,75 @@ def set_data(tree,data,pressureData):
     ET.SubElement(collectionProp,'stringProp',{"name":"3"}).text = '60'
     ## 追加
     VariableThroughputTimerCollectionProp.append(collectionProp)
+
+
+  ## 启用压测记录存储
+  BackendListener = root.find("./hashTree/hashTree/BackendListener")
+  BackendListener.set('enabled',true)
+
+  ## 压测记录存储配置
+  BackendListenerCollectionProp = root.find("./hashTree/hashTree/BackendListener/elementProp/collectionProp")
+  ### testname
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"testname"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "testname"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = data["testname"]
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### nodeName
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"nodeName"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "nodeName"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "nodeName-1"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### influxDBHost
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"influxDBHost"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "influxDBHost"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "172.31.129.103"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### influxDBPort
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"influxDBPort"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "influxDBPort"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "8086"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### influxDBUser
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"influxDBUser"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "influxDBUser"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "jmeter"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### influxDBPassword
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"influxDBPassword"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "influxDBPassword"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = ""
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### influxDBDatabase
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"influxDBDatabase"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "influxDBDatabase"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "jmeter"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### retentionPolicy
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"retentionPolicy"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "retentionPolicy"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "autogen"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### samplersList
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"samplersList"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "samplersList"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = ".*"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  ### useRegexForSamplerList
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"useRegexForSamplerList"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "useRegexForSamplerList"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "true"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
+  BackendListenerCollectionProp.append(elementProp_testname)
+  
   
   #设置项目名称
   UltimateThreadGroup.set('testname', data["testname"])

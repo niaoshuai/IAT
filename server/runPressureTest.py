@@ -266,7 +266,7 @@ def set_data(tree,data,pressureData):
 
   ## 启用压测记录存储
   BackendListener = root.find("./hashTree/hashTree/BackendListener")
-  BackendListener.set('enabled',true)
+  BackendListener.set('enabled','true')
 
   ## 压测记录存储配置
   BackendListenerCollectionProp = root.find("./hashTree/hashTree/BackendListener/elementProp/collectionProp")
@@ -279,7 +279,7 @@ def set_data(tree,data,pressureData):
   ### nodeName
   elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"nodeName"})
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "nodeName"
-  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = "nodeName-1"
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = ""
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
   BackendListenerCollectionProp.append(elementProp_testname)
   ### influxDBHost

@@ -22,13 +22,13 @@ def setTaskPressureStatus(taskId,status,msg):
   response = res.json()
   print(response["msg"])
 
-def updateTaskPressureResult(taskId,result,msg):
-  data = {'id':taskId,'result':json.dumps(result)}
-  headers = {'Content-Type':'application/json'}
-  url = 'http://127.0.0.1:5000/api/IAT/updateTaskResult'
-  res = requests.post(url,headers = headers,data=json.dumps(data))
-  response = res.json()
-  print(response["msg"])
+# def updateTaskPressureResult(taskId,result,msg):
+#   data = {'id':taskId,'result':json.dumps(result)}
+#   headers = {'Content-Type':'application/json'}
+#   url = 'http://127.0.0.1:5000/api/IAT/updatePressureTaskStatus'
+#   res = requests.post(url,headers = headers,data=json.dumps(data))
+#   response = res.json()
+#   print(response["msg"])
 
 def read_demo(demo_path):
   tree = ET.parse(demo_path)
@@ -471,7 +471,8 @@ if '__main__' == __name__:
       try:
         # RESULT_CSV_PATH=reulstPath+'/result.csv'
         # resultContent = readResult(RESULT_CSV_PATH)
-        updateTaskPressureResult(pressureTaskId,'resultContent',"upload result")
+        # updateTaskPressureResult(pressureTaskId,{"isOK":true},"upload result")
+         setTaskPressureStatus(pressureTaskId, 39, "upload result")
       except Exception as e:
         print(e)
         setTaskPressureStatus(pressureTaskId, 5, "task fail,please check jmeter env")

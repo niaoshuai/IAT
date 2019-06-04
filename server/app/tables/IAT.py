@@ -135,7 +135,7 @@ class TaskPressure(db.Model):
   up = db.Column(db.Integer)
   ins_count = db.Column(db.Integer)
   user_id = db.Column(db.Integer)
-  # 0 初始化执行状态  1 获取任务状态  2 构建任务脚本 3 执行完成 4 获取任务信息失败  5 构建压测脚本失败
+  # 0 初始化执行状态  1 获取任务状态  2 构建任务脚本 3 执行完成 4 获取任务信息失败  5 执行失败 检查jmeter  6 构建压测脚本失败  39 OK
   status = db.Column(db.Integer)
   gmt_create = db.Column(db.DateTime)
   gmt_modified = db.Column(db.DateTime)

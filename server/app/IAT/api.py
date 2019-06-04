@@ -626,7 +626,7 @@ def taskPressureExcute():
   taskPressureData = TaskPressure.query.filter_by(task_id=taskId)
   if taskPressureData.first():
     status = taskPressureData.first().status
-    if status != 3:
+    if status != 3 or status != 39:
       return make_response(jsonify({'code': 10001, 'msg': u'已经有一个压测任务在执行了!', 'content': None}))
   # 保存压测配置(持久化)
   addPressureData = TaskPressure(taskId, info["rps"], info["time"], info["up"], user_id, 0,info["ins_count"])

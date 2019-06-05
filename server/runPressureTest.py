@@ -271,8 +271,8 @@ def set_data(tree,data,pressureData):
   ## 压测记录存储配置
   BackendListenerCollectionProp = root.find("./hashTree/hashTree/BackendListener/elementProp/collectionProp")
   ### testname
-  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"testname"})
-  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = data["testname"]+"-"+str(pressureData["id"])
+  elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"testName"})
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "testName"
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = data["testname"]+"-"+str(pressureData["id"])
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
   BackendListenerCollectionProp.append(elementProp_testname)

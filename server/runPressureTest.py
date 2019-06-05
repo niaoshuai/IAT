@@ -273,7 +273,7 @@ def set_data(tree,data,pressureData):
   ### testname
   elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"testname"})
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "testname"
-  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = data["testname"]+"-"+pressureData["id"]
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = data["testname"]+"-"+str(pressureData["id"])
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
   BackendListenerCollectionProp.append(elementProp_testname)
   ### nodeName
@@ -413,7 +413,7 @@ def runJmeterTestDocker(reulstPath,taskPressureId,ins_count):
 
 def curlSlaveCall(jsonFile,reulstPath,taskId,ins_count):
   client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.1','-j /jmeter_log/slave1.log',detach=True,name="jmeter-slave-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}})
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-slave:1.0.1','-j /jmeter_log/slave1.log',detach=True,remove=True,name="jmeter-slave-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}})
   client.close
 
 def curlMasterCall(jsonFile,reulstPath,taskId):
@@ -424,7 +424,7 @@ def curlMasterCall(jsonFile,reulstPath,taskId):
 
   client = docker.DockerClient(base_url='unix://var/run/docker.sock')
   # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.1','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.1','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -X',detach=True,remove=True,name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
   client.close
 
 # def runJmeterTest1(reulstPath):

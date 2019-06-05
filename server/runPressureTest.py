@@ -273,7 +273,7 @@ def set_data(tree,data,pressureData):
   ### testname
   elementProp_testname = ET.Element('elementProp',{"elementType":"Argument","name":"testname"})
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.name"}).text = "testname"
-  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = data["testname"]
+  ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.value"}).text = data["testname"]+"-"+pressureData["id"]
   ET.SubElement(elementProp_testname,'stringProp',{"name":"Argument.metadata"}).text = "="
   BackendListenerCollectionProp.append(elementProp_testname)
   ### nodeName

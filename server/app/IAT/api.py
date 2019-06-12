@@ -929,6 +929,14 @@ def updateSample():
     db.session.commit()
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'添加成功!'}))
 
+
+def isJson(jsonstr):
+    try:
+        a = json.load(jsonstr)
+        return True
+    except:
+        return False
+
 @api.route('/debugSample', methods=['POST'])
 def debugSample():
   user_id = session.get('user_id')
@@ -994,16 +1002,16 @@ def debugSample():
         if rowData.param_type == 3:
           formartHeaders = headers
           formatParams = formParams
-          res = requests.post(url, headers=formartHeaders, files=formatParams, verify=False)
+          res = requests.post(url, headers=formartHeaders, files=formatParams, verify=False,timeout=5)
         elif rowData.param_type == 2:
           headers["content-type"] = "application/json;"
           formartHeaders = headers
           formatParams = json.dumps(req_params)
-          res = requests.post(url, headers=formartHeaders, data=formatParams, verify=False)
+          res = requests.post(url, headers=formartHeaders, data=formatParams, verify=False,timeout=5)
         else:
           formartHeaders = headers
           formatParams = req_params
-          res = requests.post(url, headers=formartHeaders, data=formatParams, verify=False)
+          res = requests.post(url, headers=formartHeaders, data=formatParams, verify=False,timeout=5)
       elif rowData.method == 'GET':
         res = requests.get(url, headers=headers, params=req_params, verify=False)
       else:
@@ -1013,94 +1021,98 @@ def debugSample():
         print(res.text)
         return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
      
-      response = res.json()
+      ## 处理请求结果json的问题
+      if isJson(res.text) == True :
+        response = res.json()
 
-       # 验证错误代码
-      # if response.:
-      #   print(res.text)
-      #   return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
-     
-      debugResult = 3
-      asserts_data = json.loads(rowData.asserts_data)
-      if len(asserts_data) > 0:
-        if rowData.asserts_type == 1:
-          for item in asserts_data:
-            debugResult = 2
-            delSpace = item["value"]
-            if delSpace and delSpace in res.text:
-              debugResult = 1
-        if rowData.asserts_type == 2:
-          ## JSON 断言
-          for item in asserts_data:
-            debugResult = 2
-            assertPathList = item["key"] ## 校验key
-            ## 排除$.
-            if(assertPathList.startswith('$.')):
-              assertPathList = assertPathList[2:] ## 截取前两位
-            assertPathList = assertPathList.split('.')
-            pathLen = len(assertPathList)
-            need_data = res.json()
-            for i in range(0, pathLen):
-              key = assertPathList[i]
-              if key == '0':
-                key = 0
-              need_data = need_data[key]
-
-            if str(need_data) == item["value"]:
-              debugResult = 1
+        # 验证错误代码
+        # if response.:
+        #   print(res.text)
+        #   return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
       
-      # 断言通过
-      # 定义参数化值获取
-      debugParams=[]
-      if debugResult == 1:
-        extract_data = json.loads(rowData.extract_data)
+        debugResult = 3
+        asserts_data = json.loads(rowData.asserts_data)
         if len(asserts_data) > 0:
-          for item in extract_data:
-
-            extractPathList = item["value"] ## 校验value
-            ## 排除$.
-            if(extractPathList.startswith('$.')):
-              extractPathList = extractPathList[2:] ## 截取前两位
-            extractPathList = extractPathList.split('.')
-            pathLen = len(extractPathList)
-            need_data = res.json()
-            for i in range(0, pathLen):
-                key = extractPathList[i]
-                if key == 'data[*]':
-                  key = "data[0]"
-                  tmpLen = len(need_data["data"])
-                  if tmpLen > 0 :
-                    tmpIndexRan = random.randint(0,tmpLen-1)
-                    need_data = need_data["data"][tmpIndexRan]
-                  continue
-                elif key == '0':
+          if rowData.asserts_type == 1:
+            for item in asserts_data:
+              debugResult = 2
+              delSpace = item["value"]
+              if delSpace and delSpace in res.text:
+                debugResult = 1
+          if rowData.asserts_type == 2:
+            ## JSON 断言
+            for item in asserts_data:
+              debugResult = 2
+              assertPathList = item["key"] ## 校验key
+              ## 排除$.
+              if(assertPathList.startswith('$.')):
+                assertPathList = assertPathList[2:] ## 截取前两位
+              assertPathList = assertPathList.split('.')
+              pathLen = len(assertPathList)
+              need_data = res.json()
+              for i in range(0, pathLen):
+                key = assertPathList[i]
+                if key == '0':
                   key = 0
-                if key not in need_data:
-                  need_data = {}
-                  break
                 need_data = need_data[key]
-            # need_data=need_data[key]
-            debugParams.append({item["key"]:need_data})
 
-      content = {
-        "debugData": response,
-        "debugResult": debugResult,
-        "debugParams":debugParams,
-      }
-      # 缓存结果
-      response = make_response(jsonify({'code': 0, 'content': content, 'msg': ''}))
+              if str(need_data) == item["value"]:
+                debugResult = 1
+        
+        # 断言通过
+        # 定义参数化值获取
+        debugParams=[]
+        if debugResult == 1:
+          extract_data = json.loads(rowData.extract_data)
+          if len(asserts_data) > 0:
+            for item in extract_data:
 
-      if len(debugParams) > 0:
-        ## 多次test集合
-        if 'debugParams1Json' in locals():
-          # debugParams1Json[0][debugParams[0]]
-          # for dk in debugParams[0].keys():
-          #   debugParams1Json[0][dK]=debugParams[0][dk]
-          for debugParamsItem in debugParams:
-            debugParams1Json[0].update(debugParamsItem)
-          response.set_cookie('debugParams',json.dumps(debugParams1Json))
-      return response
+              extractPathList = item["value"] ## 校验value
+              ## 排除$.
+              if(extractPathList.startswith('$.')):
+                extractPathList = extractPathList[2:] ## 截取前两位
+              extractPathList = extractPathList.split('.')
+              pathLen = len(extractPathList)
+              need_data = res.json()
+              for i in range(0, pathLen):
+                  key = extractPathList[i]
+                  if key == 'data[*]':
+                    key = "data[0]"
+                    tmpLen = len(need_data["data"])
+                    if tmpLen > 0 :
+                      tmpIndexRan = random.randint(0,tmpLen-1)
+                      need_data = need_data["data"][tmpIndexRan]
+                    continue
+                  elif key == '0':
+                    key = 0
+                  if key not in need_data:
+                    need_data = {}
+                    break
+                  need_data = need_data[key]
+              # need_data=need_data[key]
+              debugParams.append({item["key"]:need_data})
 
+        content = {
+          "debugData": response,
+          "debugResult": debugResult,
+          "debugParams":debugParams,
+        }
+        # 缓存结果
+        response = make_response(jsonify({'code': 0, 'content': content, 'msg': ''}))
+
+        if len(debugParams) > 0:
+          ## 多次test集合
+          if 'debugParams1Json' in locals():
+            # debugParams1Json[0][debugParams[0]]
+            # for dk in debugParams[0].keys():
+            #   debugParams1Json[0][dK]=debugParams[0][dk]
+            for debugParamsItem in debugParams:
+              debugParams1Json[0].update(debugParamsItem)
+            response.set_cookie('debugParams',json.dumps(debugParams1Json))
+        return response
+      ## HTML
+      else:
+         return make_response(jsonify({'code': 0, 'content': None, 'msg': 'HTML is OK'}))
     except Exception as e:
       print(e.with_traceback)
       return make_response(jsonify({'code': 10002, 'content': None, 'msg': '服务器异常'}))

@@ -932,12 +932,11 @@ def updateSample():
 ## 判断返回结果是否为json
 def isJson(jsonstr):
     try:
-        # json.load(jsonstr)
-        # res.content.
-        json.loads(jsonstr)
-        return True
+        yield json.loads(jsonstr)
     except:
         return False
+    return True
+    
 
 @api.route('/debugSample', methods=['POST'])
 def debugSample():
@@ -1026,7 +1025,7 @@ def debugSample():
       ## 处理请求结果json的问题
       print (res.text)
       print(isJson(res.text))
-      
+
       if isJson(res.text) == True :
         response = res.json()
 

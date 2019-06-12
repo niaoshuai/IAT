@@ -251,11 +251,12 @@ def set_data(tree,data):
       if sample['asserts']['assertType'] == 1:
         responseAssertion = ResponseAssertion(sample['asserts'])
         sampleSetDown.append(responseAssertion)
+        ET.SubElement(sampleSetDown,'hashTree')
       if sample['asserts']['assertType'] == 2:
         responseAssertion = JSONPathAssertion(sample['asserts'])
         sampleSetDown.append(responseAssertion)
-      
-      ET.SubElement(sampleSetDown,'hashTree')
+        ET.SubElement(sampleSetDown,'hashTree')      
+     
       if sample['paramType'] ==2:
         spamleHeaderManager = headerManager([{"key":"content-type","value":"application/json;"}])
         sampleSetDown.append(spamleHeaderManager)

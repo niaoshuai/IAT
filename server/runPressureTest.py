@@ -350,9 +350,11 @@ def set_data(tree,data,pressureData):
       sampleSetDown = ET.SubElement(ThreadGroupHashTree, 'hashTree')
       if sample['asserts']['assertType'] == 1:
         responseAssertion = ResponseAssertion(sample['asserts'])
+        sampleSetDown.append(responseAssertion)
       if sample['asserts']['assertType'] == 2:
         responseAssertion = JSONPathAssertion(sample['asserts'])
-      sampleSetDown.append(responseAssertion)
+        sampleSetDown.append(responseAssertion)
+      
       ET.SubElement(sampleSetDown,'hashTree')
       if sample['paramType'] ==2:
         spamleHeaderManager = headerManager([{"key":"content-type","value":"application/json;"}])

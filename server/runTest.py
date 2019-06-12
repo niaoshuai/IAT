@@ -412,6 +412,10 @@ if '__main__' == __name__:
       try:
         RESULT_CSV_PATH=reulstPath+'/result.csv'
         resultContent = readResult(RESULT_CSV_PATH)
+
+        ## 打印日志
+        print(resultContent)
+
         updateTaskResult(taskId,resultContent,"upload result")
       except Exception as e:
 

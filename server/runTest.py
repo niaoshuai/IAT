@@ -364,7 +364,7 @@ def curlMasterCall(jsonFile,reulstPath,taskId):
   os.mknod(RESULT_CSV_PATH)
 
   client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"},detach=True)
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"},remove=True)
   # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,links={"jmeter-slave-"+taskId:"jmeter-slave"})
   client.close
 
@@ -410,8 +410,10 @@ if '__main__' == __name__:
       
       setTaskStatus(taskId, 3, "excute script sucess")
       try:
-        RESULT_CSV_PATH=reulstPath+'/result.csv'
-        resultContent = readResult(RESULT_CSV_PATH)
+        RESULT_CSV_PATH1=reulstPath+'/result.csv'
+
+        print(RESULT_CSV_PATH1)
+        resultContent = readResult(RESULT_CSV_PATH1)
 
         ## 打印日志
         print(resultContent)

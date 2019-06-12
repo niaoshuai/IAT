@@ -4,7 +4,7 @@ find . -name "*.pyc" | xargs rm -rf
 
 pip3 install requests -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 ### 加速 (https://mirrors.tuna.tsinghua.edu.cn/help/pypi/,https://opsx.alibaba.com/mirror)
-python3 -m pip install requirements.txt  -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+python3 -m pip install -r requirements.txt  -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com --user
 
 pip install -r requirements.txt
 pip install --no-cache-dir -r requirements.txt (docker)

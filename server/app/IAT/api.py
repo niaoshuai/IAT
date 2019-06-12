@@ -1024,9 +1024,10 @@ def debugSample():
      
       ## 处理请求结果json的问题
       print (res.text)
-      print(isJson(res.text))
+      # print(isJson(res.text))
+      isJsonB = isJson(res.text)
 
-      if isJson(res.text) == True :
+      if isJsonB == True :
         response = res.json()
 
         # 验证错误代码
@@ -1115,7 +1116,7 @@ def debugSample():
             response.set_cookie('debugParams',json.dumps(debugParams1Json))
         return response
       ## HTML
-      else:
+      elif isJsonB == False:
         # print (res.text)
         content = {
           "debugData": "HTML",

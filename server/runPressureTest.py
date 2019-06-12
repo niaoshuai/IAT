@@ -426,7 +426,7 @@ def curlMasterCall(jsonFile,reulstPath,taskId):
 
   client = docker.DockerClient(base_url='unix://var/run/docker.sock')
   # client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.0','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -l '+RESULT_CSV_PATH+' -X',name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
-  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.1','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -X',detach=True,remove=True,name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
+  client.containers.run('registry.cn-beijing.aliyuncs.com/niao-jmeter/jmeter-master:1.0.1','-j /jmeter_log/slave1.log -t '+JMX_PATH+' -R jmeter-slave -X',detach=True,name="jmeter-master-"+taskId,volumes={'iat_iat_data': {'bind': '/jmeter_log', 'mode': 'rw'}},links={"jmeter-slave-"+taskId:"jmeter-slave"})
   client.close
 
 # def runJmeterTest1(reulstPath):

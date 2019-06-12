@@ -930,9 +930,10 @@ def updateSample():
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'添加成功!'}))
 
 
-def isJson(jsonstr):
+def isJson(res):
     try:
-        a = json.load(jsonstr)
+        # json.load(jsonstr)
+        res.json()
         return True
     except:
         return False
@@ -1022,7 +1023,7 @@ def debugSample():
         return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
      
       ## 处理请求结果json的问题
-      if isJson(res.text) == True :
+      if isJson(res) == True :
         response = res.json()
 
         # 验证错误代码

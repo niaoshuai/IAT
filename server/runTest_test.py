@@ -2,7 +2,7 @@
 import unittest,json
 from datetime import datetime
 
-from runTest import makeResultPath,read_demo,set_data,indent,readResult
+# from runTest import makeResultPath,read_demo,set_data,indent,readResult
 
 class TestRunJmeterTest(unittest.TestCase):
 
@@ -22,8 +22,18 @@ class TestRunJmeterTest(unittest.TestCase):
     #   indent(tree.getroot())
     #   tree.write(reulstPath+'/test.jmx', encoding="utf-8")
 
-    def test_read(self):
-      print(readResult("/var/lib/docker/volumes/iat_iat_data/_data/2019-05-21_09_21_37/result.csv"))
+    # def test_read(self):
+    #   print(readResult("/var/lib/docker/volumes/iat_iat_data/_data/2019-05-21_09_21_37/result.csv"))
+
+    def test_jsJson(self):
+      # json.loads("{}")
+        try:
+          json.loads(jsonstr)
+          print(True) 
+        except:
+          print(False) 
+     
+
 
 
 

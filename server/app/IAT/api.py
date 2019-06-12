@@ -1024,6 +1024,9 @@ def debugSample():
         return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
      
       ## 处理请求结果json的问题
+      print (res.text)
+      print(isJson(res.text))
+      
       if isJson(res.text) == True :
         response = res.json()
 
@@ -1122,7 +1125,7 @@ def debugSample():
         }
         return make_response(jsonify({'code': 0, 'content': content, 'msg': 'HTML is OK'}))
     except Exception as e:
-      print(e.with_traceback)
+      print(e)
       return make_response(jsonify({'code': 10002, 'content': None, 'msg': '服务器异常'}))
 
 def encrypt_name(name, salt=None, encryptlop=30):

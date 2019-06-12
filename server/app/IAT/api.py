@@ -1112,8 +1112,13 @@ def debugSample():
         return response
       ## HTML
       else:
-         print (res.text)
-         return make_response(jsonify({'code': 0, 'content': None, 'msg': 'HTML is OK'}))
+        # print (res.text)
+        content = {
+          "debugData": "HTML",
+          "debugResult": 1,
+          "debugParams":[],
+        }
+        return make_response(jsonify({'code': 0, 'content': None, 'msg': 'HTML is OK'}))
     except Exception as e:
       print(e.with_traceback)
       return make_response(jsonify({'code': 10002, 'content': None, 'msg': '服务器异常'}))

@@ -931,11 +931,14 @@ def updateSample():
 
 ## 判断返回结果是否为json
 def isJson(jsonstr):
+    isOk = False
     try:
-        yield json.loads(jsonstr)
+        json.loads(jsonstr)
+        isOk =true
     except:
-        return False
-    return True
+        isOk = False
+    return isOk
+    
     
 
 @api.route('/debugSample', methods=['POST'])
@@ -1023,9 +1026,10 @@ def debugSample():
         return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
      
       ## 处理请求结果json的问题
-      print (res.text)
+      # print (res.text)
       # print(isJson(res.text))
       isJsonB = isJson(res.text)
+      print("是否是json:"+str(isJsonB))
 
       if isJsonB == True :
         response = res.json()

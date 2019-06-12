@@ -1102,8 +1102,8 @@ def debugSample():
       return response
 
     except Exception as e:
-      print(e)
-      return make_response(jsonify({'code': 10001, 'content': None, 'msg': 'server error!'}))
+      print(e.with_traceback)
+      return make_response(jsonify({'code': 10002, 'content': None, 'msg': '服务器异常'}))
 
 def encrypt_name(name, salt=None, encryptlop=30):
   if not salt:

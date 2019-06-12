@@ -1118,7 +1118,7 @@ def debugSample():
           "debugResult": 1,
           "debugParams":[],
         }
-        return make_response(jsonify({'code': 0, 'content': None, 'msg': 'HTML is OK'}))
+        return make_response(jsonify({'code': 0, 'content': content, 'msg': 'HTML is OK'}))
     except Exception as e:
       print(e.with_traceback)
       return make_response(jsonify({'code': 10002, 'content': None, 'msg': '服务器异常'}))

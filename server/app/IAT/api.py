@@ -930,11 +930,11 @@ def updateSample():
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'添加成功!'}))
 
 ## 判断返回结果是否为json
-def isJson(jsonstr):
+def isJson(res):
     isOk = False
     try:
-        json.loads(jsonstr)
-        isOk =true
+        res.json()
+        isOk = True
     except:
         isOk = False
     return isOk
@@ -1028,7 +1028,7 @@ def debugSample():
       ## 处理请求结果json的问题
       # print (res.text)
       # print(isJson(res.text))
-      isJsonB = isJson(res.text)
+      isJsonB = isJson(res)
       print("是否是json:"+str(isJsonB))
 
       if isJsonB == True :

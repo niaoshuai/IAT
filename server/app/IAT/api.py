@@ -929,11 +929,12 @@ def updateSample():
     db.session.commit()
     return make_response(jsonify({'code': 0, 'content': None, 'msg': u'添加成功!'}))
 
-
-def isJson(res):
+## 判断返回结果是否为json
+def isJson(jsonstr):
     try:
         # json.load(jsonstr)
-        res.json()
+        # res.content.
+        json.loads(jsonstr)
         return True
     except:
         return False
@@ -1023,7 +1024,7 @@ def debugSample():
         return make_response(jsonify({'code': 10001, 'content': None, 'msg': '到API的连接有问题'}))
      
       ## 处理请求结果json的问题
-      if isJson(res) == True :
+      if isJson(res.text) == True :
         response = res.json()
 
         # 验证错误代码

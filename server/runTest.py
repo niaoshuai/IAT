@@ -243,6 +243,9 @@ def set_data(tree,data):
   ThreadGroupHashTree.append(ConfigTestElement)
   ET.SubElement(ThreadGroupHashTree,'hashTree')
   #增加请求节点
+  
+  print(data['samples'])
+
   if data['samples']:
     for sample in data["samples"]:
       httpSamplerProxy = HTTPSamplerProxy(sample)

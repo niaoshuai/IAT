@@ -1424,6 +1424,7 @@ class Interface extends Component {
           </div>
           <div className={styles.item_content_container}>
             <Radio.Group value={infoAssertType} onChange={e => this.handleAssertTypeChange(e)}>
+              <Radio value={0}>不断言</Radio>
               <Radio value={1}>响应断言</Radio>
               <Radio value={2}>JSON断言</Radio>
             </Radio.Group>
@@ -1465,7 +1466,7 @@ class Interface extends Component {
                   className={styles.item_item}
                   style={{ height: 60 }}
                 >
-                  <Icon type="plus" /> Add field
+                  <Icon type="plus" /> 添加
                 </Button>
               </div>
             )}
@@ -1501,7 +1502,7 @@ class Interface extends Component {
                   className={styles.item_item}
                   style={{ height: 60 }}
                 >
-                  <Icon type="plus" /> Add field
+                  <Icon type="plus" /> 添加
                 </Button>
               </div>
             )}

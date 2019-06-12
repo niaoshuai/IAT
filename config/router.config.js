@@ -129,6 +129,11 @@ export default [
                 component: './IAT/Task/timing',
               },
               {
+                //   path: '/task/pressure/list',
+                //   name: 'list',
+                //   component: './IAT/Task/pressure',
+                // },
+                // {
                 path: '/task/timing/add',
                 name: 'add',
                 component: './IAT/Task/addTim',

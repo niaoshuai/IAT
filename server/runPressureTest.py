@@ -145,7 +145,6 @@ def HTTPSamplerProxy(sample):
           ET.SubElement(paramElementProp, 'boolProp', {"name": "HTTPArgument.use_equals"}).text = 'true'
           ET.SubElement(paramElementProp, 'stringProp', {"name": "Argument.name"}).text = item["key"]
           collectionProp.append(paramElementProp)
-
   DO_MULTIPART_POST = "false"
   if sample['paramType'] ==3:
     DO_MULTIPART_POST = "true"
@@ -160,8 +159,8 @@ def HTTPSamplerProxy(sample):
   ET.SubElement(HTTPSamplerProxy, 'stringProp', {"name":"HTTPSampler.use_keepalive"}).text = "true"
   ET.SubElement(HTTPSamplerProxy, 'stringProp', {"name":"HTTPSampler.DO_MULTIPART_POST"}).text = DO_MULTIPART_POST
   ET.SubElement(HTTPSamplerProxy, 'stringProp', {"name":"HTTPSampler.embedded_url_re"})
-  ET.SubElement(HTTPSamplerProxy, 'stringProp', {"name":"HTTPSampler.connect_timeout"})
-  ET.SubElement(HTTPSamplerProxy, 'stringProp', {"name":"HTTPSampler.response_timeout"})
+  ET.SubElement(HTTPSamplerProxy, 'stringProp', {"name":"HTTPSampler.connect_timeout"}).text = "15000"
+  ET.SubElement(HTTPSamplerProxy, 'stringProp', {"name":"HTTPSampler.response_timeout"}).test = "15000"
   return HTTPSamplerProxy
 
 def ResponseAssertion(data):

@@ -185,12 +185,12 @@ def JSONPathAssertion(data):
   ET.SubElement(JSONPathAssertion, 'boolProp', {"name": "ISREGEX"}).text = "false"
   return JSONPathAssertion
 
-def jSONPostProcessor(data):
+def jSONPostProcessor(item):
   JSONPostProcessor = ET.Element('JSONPostProcessor',
                                  {"guiclass": "JSONPostProcessorGui", "testclass": "JSONPostProcessor",
                                   "testname": u"JSON提取器", "enabled": "true"})
-  ET.SubElement(JSONPostProcessor, 'stringProp', {"name": "JSONPostProcessor.referenceNames"}).text = data['extractData'][0]['key']
-  ET.SubElement(JSONPostProcessor, 'stringProp', {"name": "JSONPostProcessor.jsonPathExprs"}).text = data['extractData'][0]['value']
+  ET.SubElement(JSONPostProcessor, 'stringProp', {"name": "JSONPostProcessor.referenceNames"}).text = item['key']
+  ET.SubElement(JSONPostProcessor, 'stringProp', {"name": "JSONPostProcessor.jsonPathExprs"}).text = item['value']
   ET.SubElement(JSONPostProcessor, 'stringProp', {"name": "JSONPostProcessor.match_numbers"})
   return JSONPostProcessor
 
@@ -344,6 +344,8 @@ def set_data(tree,data,pressureData):
   #增加请求节点
   if data['samples']:
     for sample in data["samples"]:
+      dataExtract = sample['extract']
+
       httpSamplerProxy = HTTPSamplerProxy(sample)
       ThreadGroupHashTree.append(httpSamplerProxy)
       sampleSetDown = ET.SubElement(ThreadGroupHashTree, 'hashTree')
@@ -355,16 +357,17 @@ def set_data(tree,data,pressureData):
         responseAssertion = JSONPathAssertion(sample['asserts'])
         sampleSetDown.append(responseAssertion)
         ET.SubElement(sampleSetDown,'hashTree')
-      
      
       if sample['paramType'] ==2:
         spamleHeaderManager = headerManager([{"key":"content-type","value":"application/json;"}])
         sampleSetDown.append(spamleHeaderManager)
         ET.SubElement(sampleSetDown, 'hashTree')
-      if sample['extract']['extractType'] == 1:
-        JSONPostProcessor = jSONPostProcessor(sample['extract'])
-        sampleSetDown.append(JSONPostProcessor)
-        ET.SubElement(sampleSetDown, 'hashTree')
+      if dataExtract['extractType'] == 1:
+        if dataExtract['extractData']:
+          for item in  dataExtract['extractData']:
+            JSONPostProcessor = jSONPostProcessor(item)
+            sampleSetDown.append(JSONPostProcessor)
+            ET.SubElement(sampleSetDown, 'hashTree')
       if sample['preShellType'] == 1:
         BeanShellPreProcessor = beanShellPreProcessor(sample['preShellData'])
         sampleSetDown.append(BeanShellPreProcessor)
